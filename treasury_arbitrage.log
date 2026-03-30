@@ -1,0 +1,878 @@
+2025-12-02 11:43:27,599 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-02 11:43:27,600 - INFO - Connected
+2025-12-02 11:43:27,606 - INFO - Logged on to server version 176
+2025-12-02 11:43:27,608 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-02 11:43:27,608 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-02 11:43:27,609 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-02 11:43:27,609 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-02 11:43:27,609 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-02 11:43:27,609 - INFO - API connection ready
+2025-12-02 11:43:27,719 - INFO - Synchronization complete
+2025-12-02 11:43:27,729 - INFO - 
+2025-12-02 11:43:27,729 - INFO - ================================================================================
+2025-12-02 11:43:27,730 - INFO - ================================================================================
+2025-12-02 11:43:27,730 - INFO - Account Equity: $0.00
+2025-12-02 11:43:27,730 - INFO - Position Range: 1.0% - 5.0%
+2025-12-02 11:43:27,731 - INFO - Arbitrage Threshold: 0.3%
+2025-12-02 11:43:27,731 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-02 11:43:27,731 - INFO - ================================================================================
+2025-12-02 11:43:27,733 - INFO - Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-02 11:43:27,733 - WARNING - Error with ZN: name 'Future' is not defined
+2025-12-02 11:43:27,733 - WARNING - Error with ZB: name 'Future' is not defined
+2025-12-02 11:43:27,733 - WARNING - Error with ZF: name 'Future' is not defined
+2025-12-02 11:43:27,734 - WARNING - Error with ZT: name 'Future' is not defined
+2025-12-02 11:43:27,734 - INFO - Found 0 US Treasury futures contracts
+2025-12-02 11:43:27,735 - INFO - Disconnecting from 127.0.0.1:7497, 117 B sent in 8 messages, 12.0 kB received in 258 messages, session time 137 ms.
+2025-12-02 11:43:27,736 - INFO - Disconnecting
+2025-12-02 11:43:27,737 - INFO - Disconnected.
+2025-12-02 20:02:04,407 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-02 20:02:04,409 - INFO - Connected
+2025-12-02 20:02:04,456 - INFO - Logged on to server version 176
+2025-12-02 20:02:04,464 - INFO - API connection ready
+2025-12-02 20:02:04,468 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-02 20:02:04,469 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-02 20:02:04,469 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-02 20:02:04,469 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-02 20:02:04,469 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-02 20:02:04,469 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-02 20:02:04,782 - INFO - Synchronization complete
+2025-12-02 20:02:04,832 - INFO - 
+2025-12-02 20:02:04,832 - INFO - ================================================================================
+2025-12-02 20:02:04,834 - INFO - ================================================================================
+2025-12-02 20:02:04,834 - INFO - Account Equity: $0.00
+2025-12-02 20:02:04,834 - INFO - Position Range: 1.0% - 5.0%
+2025-12-02 20:02:04,834 - INFO - Arbitrage Threshold: 0.3%
+2025-12-02 20:02:04,834 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-02 20:02:04,834 - INFO - ================================================================================
+2025-12-02 20:02:04,837 - INFO - Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-02 20:02:05,297 - WARNING - Ambiguous contract: Future(symbol='ZN', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN'), Contract(secType='FUT', conId=792996527, symbol='ZN', lastTradeDateOrContractMonth='20260320', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNH6', tradingClass='ZN'), Contract(secType='FUT', conId=815824229, symbol='ZN', lastTradeDateOrContractMonth='20260618', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNM6', tradingClass='ZN')]
+2025-12-02 20:02:05,637 - WARNING - Ambiguous contract: Future(symbol='ZB', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB'), Contract(secType='FUT', conId=792996522, symbol='ZB', lastTradeDateOrContractMonth='20260320', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBH6', tradingClass='ZB'), Contract(secType='FUT', conId=815824224, symbol='ZB', lastTradeDateOrContractMonth='20260618', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBM6', tradingClass='ZB')]
+2025-12-02 20:02:05,977 - WARNING - Ambiguous contract: Future(symbol='ZF', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF'), Contract(secType='FUT', conId=795951500, symbol='ZF', lastTradeDateOrContractMonth='20260331', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFH6', tradingClass='ZF'), Contract(secType='FUT', conId=818615223, symbol='ZF', lastTradeDateOrContractMonth='20260630', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFM6', tradingClass='ZF')]
+2025-12-02 20:02:06,361 - WARNING - Ambiguous contract: Future(symbol='ZT', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT'), Contract(secType='FUT', conId=795951517, symbol='ZT', lastTradeDateOrContractMonth='20260331', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTH6', tradingClass='ZT'), Contract(secType='FUT', conId=818615229, symbol='ZT', lastTradeDateOrContractMonth='20260630', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTM6', tradingClass='ZT')]
+2025-12-02 20:02:06,361 - INFO - Found 0 US Treasury futures contracts
+2025-12-02 20:02:06,366 - INFO - Disconnecting from 127.0.0.1:7497, 289 B sent in 12 messages, 21.6 kB received in 275 messages, session time 1.96 s.
+2025-12-02 20:02:06,366 - INFO - Disconnecting
+2025-12-02 20:02:06,368 - INFO - Disconnected.
+2025-12-02 20:04:41,325 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-02 20:04:41,326 - INFO - Connected
+2025-12-02 20:04:41,330 - INFO - Logged on to server version 176
+2025-12-02 20:04:41,331 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-02 20:04:41,331 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-02 20:04:41,332 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-02 20:04:41,332 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-02 20:04:41,332 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-02 20:04:41,332 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-02 20:04:41,332 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-02 20:04:41,332 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-02 20:04:41,333 - INFO - API connection ready
+2025-12-02 20:04:41,440 - INFO - Synchronization complete
+2025-12-02 20:04:41,446 - INFO - 
+2025-12-02 20:04:41,447 - INFO - ================================================================================
+2025-12-02 20:04:41,448 - INFO - ================================================================================
+2025-12-02 20:04:41,448 - INFO - Account Equity: $0.00
+2025-12-02 20:04:41,448 - INFO - Position Range: 1.0% - 5.0%
+2025-12-02 20:04:41,448 - INFO - Arbitrage Threshold: 0.3%
+2025-12-02 20:04:41,448 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-02 20:04:41,448 - INFO - ================================================================================
+2025-12-02 20:04:41,451 - INFO - Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-02 20:04:41,541 - WARNING - Ambiguous contract: Future(symbol='ZN', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN'), Contract(secType='FUT', conId=792996527, symbol='ZN', lastTradeDateOrContractMonth='20260320', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNH6', tradingClass='ZN'), Contract(secType='FUT', conId=815824229, symbol='ZN', lastTradeDateOrContractMonth='20260618', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNM6', tradingClass='ZN')]
+2025-12-02 20:04:41,625 - WARNING - Ambiguous contract: Future(symbol='ZB', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB'), Contract(secType='FUT', conId=792996522, symbol='ZB', lastTradeDateOrContractMonth='20260320', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBH6', tradingClass='ZB'), Contract(secType='FUT', conId=815824224, symbol='ZB', lastTradeDateOrContractMonth='20260618', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBM6', tradingClass='ZB')]
+2025-12-02 20:04:41,709 - WARNING - Ambiguous contract: Future(symbol='ZF', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF'), Contract(secType='FUT', conId=795951500, symbol='ZF', lastTradeDateOrContractMonth='20260331', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFH6', tradingClass='ZF'), Contract(secType='FUT', conId=818615223, symbol='ZF', lastTradeDateOrContractMonth='20260630', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFM6', tradingClass='ZF')]
+2025-12-02 20:04:41,793 - WARNING - Ambiguous contract: Future(symbol='ZT', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT'), Contract(secType='FUT', conId=795951517, symbol='ZT', lastTradeDateOrContractMonth='20260331', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTH6', tradingClass='ZT'), Contract(secType='FUT', conId=818615229, symbol='ZT', lastTradeDateOrContractMonth='20260630', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTM6', tradingClass='ZT')]
+2025-12-02 20:04:41,794 - INFO - Found 0 US Treasury futures contracts
+2025-12-02 20:04:41,797 - INFO - Disconnecting from 127.0.0.1:7497, 289 B sent in 12 messages, 21.7 kB received in 277 messages, session time 472 ms.
+2025-12-02 20:04:41,797 - INFO - Disconnecting
+2025-12-02 20:04:41,799 - INFO - Disconnected.
+2025-12-02 20:05:14,560 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-02 20:05:14,561 - INFO - Connected
+2025-12-02 20:05:14,565 - INFO - Logged on to server version 176
+2025-12-02 20:05:14,566 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-02 20:05:14,566 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-02 20:05:14,567 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-02 20:05:14,567 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-02 20:05:14,567 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-02 20:05:14,567 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-02 20:05:14,567 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-02 20:05:14,567 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-02 20:05:14,567 - INFO - API connection ready
+2025-12-02 20:05:14,690 - INFO - Synchronization complete
+2025-12-02 20:05:14,738 - INFO - 
+2025-12-02 20:05:14,738 - INFO - ================================================================================
+2025-12-02 20:05:14,740 - INFO - ================================================================================
+2025-12-02 20:05:14,740 - INFO - Account Equity: $0.00
+2025-12-02 20:05:14,740 - INFO - Position Range: 1.0% - 5.0%
+2025-12-02 20:05:14,740 - INFO - Arbitrage Threshold: 0.3%
+2025-12-02 20:05:14,740 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-02 20:05:14,740 - INFO - ================================================================================
+2025-12-02 20:05:14,742 - INFO - Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-02 20:05:14,838 - WARNING - Ambiguous contract: Future(symbol='ZN', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN'), Contract(secType='FUT', conId=792996527, symbol='ZN', lastTradeDateOrContractMonth='20260320', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNH6', tradingClass='ZN'), Contract(secType='FUT', conId=815824229, symbol='ZN', lastTradeDateOrContractMonth='20260618', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNM6', tradingClass='ZN')]
+2025-12-02 20:05:14,932 - WARNING - Ambiguous contract: Future(symbol='ZB', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB'), Contract(secType='FUT', conId=792996522, symbol='ZB', lastTradeDateOrContractMonth='20260320', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBH6', tradingClass='ZB'), Contract(secType='FUT', conId=815824224, symbol='ZB', lastTradeDateOrContractMonth='20260618', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBM6', tradingClass='ZB')]
+2025-12-02 20:05:15,021 - WARNING - Ambiguous contract: Future(symbol='ZF', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF'), Contract(secType='FUT', conId=795951500, symbol='ZF', lastTradeDateOrContractMonth='20260331', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFH6', tradingClass='ZF'), Contract(secType='FUT', conId=818615223, symbol='ZF', lastTradeDateOrContractMonth='20260630', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFM6', tradingClass='ZF')]
+2025-12-02 20:05:15,110 - WARNING - Ambiguous contract: Future(symbol='ZT', exchange='CBOT', currency='USD'), possibles are [Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT'), Contract(secType='FUT', conId=795951517, symbol='ZT', lastTradeDateOrContractMonth='20260331', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTH6', tradingClass='ZT'), Contract(secType='FUT', conId=818615229, symbol='ZT', lastTradeDateOrContractMonth='20260630', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTM6', tradingClass='ZT')]
+2025-12-02 20:05:15,111 - INFO - Found 0 US Treasury futures contracts
+2025-12-02 20:05:15,118 - INFO - Disconnecting from 127.0.0.1:7497, 289 B sent in 12 messages, 21.7 kB received in 277 messages, session time 557 ms.
+2025-12-02 20:05:15,118 - INFO - Disconnecting
+2025-12-02 20:05:15,120 - INFO - Disconnected.
+2025-12-02 20:07:37,619 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-02 20:07:37,620 - INFO - Connected
+2025-12-02 20:07:37,622 - INFO - Logged on to server version 176
+2025-12-02 20:07:37,623 - INFO - API connection ready
+2025-12-02 20:07:37,623 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-02 20:07:37,624 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-02 20:07:37,624 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-02 20:07:37,624 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-02 20:07:37,624 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-02 20:07:37,928 - INFO - Synchronization complete
+2025-12-02 20:07:37,929 - INFO - [OK] Connected to IB at 127.0.0.1:7497
+2025-12-02 20:07:37,930 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-02 20:07:39,048 - ERROR - [ERROR] Error updating account info: This event loop is already running
+2025-12-02 20:07:39,048 - INFO - 
+2025-12-02 20:07:39,049 - INFO - ================================================================================
+2025-12-02 20:07:39,050 - INFO - [START] US TREASURY ARBITRAGE BOT - DYNAMIC POSITION SIZING
+2025-12-02 20:07:39,051 - INFO - ================================================================================
+2025-12-02 20:07:39,051 - INFO - Account Equity: $0.00
+2025-12-02 20:07:39,051 - INFO - Position Range: 1.0% - 5.0%
+2025-12-02 20:07:39,052 - INFO - Arbitrage Threshold: 0.3%
+2025-12-02 20:07:39,052 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-02 20:07:39,053 - INFO - ================================================================================
+2025-12-02 20:07:39,053 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-02 20:07:40,149 - ERROR - [ERROR] Error updating account info: This event loop is already running
+2025-12-02 20:07:40,150 - INFO - 
+[STEP 1] Scanning US Treasury bonds...
+2025-12-02 20:07:40,151 - INFO - [SCAN] Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-02 20:07:40,243 - INFO - [FOUND] ZNZ5 - 10-Year U.S. Treasury Note - Expiry: 20251219
+2025-12-02 20:07:40,335 - INFO - [FOUND] ZBZ5 - 30-Year U.S. Treasury Bond - Expiry: 20251219
+2025-12-02 20:07:40,426 - INFO - [FOUND] ZFZ5 - 5-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-02 20:07:40,524 - INFO - [FOUND] ZTZ5 - 2-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-02 20:07:40,525 - INFO - [SCAN COMPLETE] Found 4 US Treasury futures contracts
+2025-12-02 20:07:40,526 - INFO - 
+[STEP 2] Analyzing 4 bonds...
+2025-12-02 20:07:40,657 - ERROR - Error 354, reqId 9: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZN DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-02 20:07:42,543 - WARNING - [WARNING] No valid price for ZNZ5
+2025-12-02 20:07:42,654 - ERROR - Error 354, reqId 10: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZB DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-02 20:07:44,551 - WARNING - [WARNING] No valid price for ZBZ5
+2025-12-02 20:07:44,669 - ERROR - Error 354, reqId 11: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZF DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-02 20:07:46,570 - WARNING - [WARNING] No valid price for ZFZ5
+2025-12-02 20:07:46,766 - ERROR - Error 354, reqId 12: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZT DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-02 20:07:48,588 - WARNING - [WARNING] No valid price for ZTZ5
+2025-12-02 20:07:48,588 - INFO - 
+2025-12-02 20:07:48,590 - INFO - ================================================================================
+2025-12-02 20:07:48,590 - INFO - [SUMMARY] OPPORTUNITY SUMMARY
+2025-12-02 20:07:48,590 - INFO - ================================================================================
+2025-12-02 20:07:48,591 - INFO - 
+[INFO] No tradeable opportunities found with current criteria
+2025-12-02 20:07:48,592 - INFO - 
+[COMPLETE] Strategy execution complete
+2025-12-02 20:07:48,592 - INFO - Disconnecting from 127.0.0.1:7497, 1.77 kB sent in 18 messages, 41.5 kB received in 731 messages, session time 11.0 s.
+2025-12-02 20:07:48,593 - INFO - Disconnecting
+2025-12-02 20:07:48,594 - INFO - [DISCONNECT] Disconnected from Interactive Brokers
+2025-12-02 20:07:48,594 - INFO - Disconnected.
+2025-12-02 20:17:25,556 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-02 20:17:25,557 - INFO - Connected
+2025-12-02 20:17:25,602 - INFO - Logged on to server version 176
+2025-12-02 20:17:25,610 - INFO - API connection ready
+2025-12-02 20:17:25,613 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-02 20:17:25,614 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-02 20:17:25,614 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-02 20:17:25,614 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-02 20:17:25,615 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-02 20:17:25,615 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-02 20:17:25,615 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-02 20:17:25,615 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-02 20:17:25,925 - INFO - Synchronization complete
+2025-12-02 20:17:25,925 - INFO - [OK] Connected to IB at 127.0.0.1:7497
+2025-12-02 20:17:25,925 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-02 20:17:25,926 - INFO - [EQUITY] Account Equity: €1,001,812.77 EUR ≈ $1,081,957.79 USD (converted)
+2025-12-02 20:17:25,926 - INFO - [POSITIONS] No active positions
+2025-12-02 20:17:25,926 - INFO - 
+2025-12-02 20:17:25,928 - INFO - ================================================================================
+2025-12-02 20:17:25,928 - INFO - [START] US TREASURY ARBITRAGE BOT - DYNAMIC POSITION SIZING
+2025-12-02 20:17:25,928 - INFO - ================================================================================
+2025-12-02 20:17:25,928 - INFO - Account Equity: $1,081,957.79
+2025-12-02 20:17:25,928 - INFO - Position Range: 1.0% - 5.0%
+2025-12-02 20:17:25,928 - INFO - Arbitrage Threshold: 0.3%
+2025-12-02 20:17:25,928 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-02 20:17:25,928 - INFO - ================================================================================
+2025-12-02 20:17:25,928 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-02 20:17:25,928 - INFO - [EQUITY] Account Equity: €1,001,812.77 EUR ≈ $1,081,957.79 USD (converted)
+2025-12-02 20:17:25,928 - INFO - [POSITIONS] No active positions
+2025-12-02 20:17:25,928 - INFO - 
+[STEP 1] Scanning US Treasury bonds...
+2025-12-02 20:17:25,928 - INFO - [SCAN] Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-02 20:17:26,121 - INFO - [FOUND] ZNZ5 - 10-Year U.S. Treasury Note - Expiry: 20251219
+2025-12-02 20:17:26,295 - INFO - [FOUND] ZBZ5 - 30-Year U.S. Treasury Bond - Expiry: 20251219
+2025-12-02 20:17:26,392 - INFO - [FOUND] ZFZ5 - 5-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-02 20:17:26,572 - INFO - [FOUND] ZTZ5 - 2-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-02 20:17:26,572 - INFO - [SCAN COMPLETE] Found 4 US Treasury futures contracts
+2025-12-02 20:17:26,572 - INFO - 
+[STEP 2] Analyzing 4 bonds...
+2025-12-02 20:17:26,788 - ERROR - Error 354, reqId 7: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZN DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-02 20:17:28,591 - WARNING - [WARNING] No valid price for ZNZ5
+2025-12-02 20:17:28,768 - ERROR - Error 354, reqId 8: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZB DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-02 20:17:30,611 - WARNING - [WARNING] No valid price for ZBZ5
+2025-12-02 20:17:30,771 - ERROR - Error 354, reqId 9: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZF DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-02 20:17:32,617 - WARNING - [WARNING] No valid price for ZFZ5
+2025-12-02 20:17:32,774 - ERROR - Error 354, reqId 10: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZT DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-02 20:17:34,614 - WARNING - [WARNING] No valid price for ZTZ5
+2025-12-02 20:17:34,614 - INFO - 
+2025-12-02 20:17:34,614 - INFO - ================================================================================
+2025-12-02 20:17:34,615 - INFO - [SUMMARY] OPPORTUNITY SUMMARY
+2025-12-02 20:17:34,616 - INFO - ================================================================================
+2025-12-02 20:17:34,616 - INFO - 
+[INFO] No tradeable opportunities found with current criteria
+2025-12-02 20:17:34,616 - INFO - 
+[COMPLETE] Strategy execution complete
+2025-12-02 20:17:34,616 - INFO - Disconnecting from 127.0.0.1:7497, 582 B sent in 16 messages, 22.3 kB received in 281 messages, session time 9.06 s.
+2025-12-02 20:17:34,617 - INFO - Disconnecting
+2025-12-02 20:17:34,618 - INFO - [DISCONNECT] Disconnected from Interactive Brokers
+2025-12-02 20:17:34,619 - INFO - Disconnected.
+2025-12-03 18:58:46,615 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-03 18:58:46,616 - INFO - Connected
+2025-12-03 18:58:46,642 - INFO - Logged on to server version 176
+2025-12-03 18:58:46,648 - INFO - API connection ready
+2025-12-03 18:58:46,650 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-03 18:58:46,650 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:hfarm
+2025-12-03 18:58:46,651 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:jfarm
+2025-12-03 18:58:46,651 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-03 18:58:46,651 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-03 18:58:46,651 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-03 18:58:46,651 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-03 18:58:46,651 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-03 18:58:46,651 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:euhmds
+2025-12-03 18:58:46,651 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:fundfarm
+2025-12-03 18:58:46,651 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-03 18:58:46,651 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-03 18:58:46,953 - INFO - Synchronization complete
+2025-12-03 18:58:46,953 - INFO - [OK] Connected to IB at 127.0.0.1:7497
+2025-12-03 18:58:46,954 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-03 18:58:46,954 - INFO - [EQUITY] Account Equity: €1,001,855.84 EUR ≈ $1,082,004.31 USD (converted)
+2025-12-03 18:58:46,955 - INFO - [POSITIONS] No active positions
+2025-12-03 18:58:46,955 - INFO - 
+2025-12-03 18:58:46,955 - INFO - ================================================================================
+2025-12-03 18:58:46,955 - INFO - [START] US TREASURY ARBITRAGE BOT - DYNAMIC POSITION SIZING
+2025-12-03 18:58:46,955 - INFO - ================================================================================
+2025-12-03 18:58:46,955 - INFO - Account Equity: $1,082,004.31
+2025-12-03 18:58:46,955 - INFO - Position Range: 1.0% - 5.0%
+2025-12-03 18:58:46,955 - INFO - Arbitrage Threshold: 0.3%
+2025-12-03 18:58:46,955 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-03 18:58:46,956 - INFO - ================================================================================
+2025-12-03 18:58:46,956 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-03 18:58:46,956 - INFO - [EQUITY] Account Equity: €1,001,855.84 EUR ≈ $1,082,004.31 USD (converted)
+2025-12-03 18:58:46,956 - INFO - [POSITIONS] No active positions
+2025-12-03 18:58:46,956 - INFO - 
+[STEP 1] Scanning US Treasury bonds...
+2025-12-03 18:58:46,956 - INFO - [SCAN] Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-03 18:58:47,298 - INFO - [FOUND] ZNZ5 - 10-Year U.S. Treasury Note - Expiry: 20251219
+2025-12-03 18:58:47,630 - INFO - [FOUND] ZBZ5 - 30-Year U.S. Treasury Bond - Expiry: 20251219
+2025-12-03 18:58:47,800 - INFO - [FOUND] ZFZ5 - 5-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-03 18:58:48,129 - INFO - [FOUND] ZTZ5 - 2-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-03 18:58:48,130 - INFO - [SCAN COMPLETE] Found 4 US Treasury futures contracts
+2025-12-03 18:58:48,130 - INFO - 
+[STEP 2] Analyzing 4 bonds...
+2025-12-03 18:58:48,272 - ERROR - Error 354, reqId 7: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZN DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-03 18:58:50,131 - WARNING - [WARNING] No valid price for ZNZ5
+2025-12-03 18:58:50,271 - ERROR - Error 354, reqId 8: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZB DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-03 18:58:52,144 - WARNING - [WARNING] No valid price for ZBZ5
+2025-12-03 18:58:52,275 - ERROR - Error 354, reqId 9: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZF DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-03 18:58:54,158 - WARNING - [WARNING] No valid price for ZFZ5
+2025-12-03 18:58:54,278 - ERROR - Error 354, reqId 10: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZT DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-03 18:58:56,161 - WARNING - [WARNING] No valid price for ZTZ5
+2025-12-03 18:58:56,162 - INFO - 
+2025-12-03 18:58:56,163 - INFO - ================================================================================
+2025-12-03 18:58:56,163 - INFO - [SUMMARY] OPPORTUNITY SUMMARY
+2025-12-03 18:58:56,163 - INFO - ================================================================================
+2025-12-03 18:58:56,163 - INFO - 
+[INFO] No tradeable opportunities found with current criteria
+2025-12-03 18:58:56,164 - INFO - 
+[COMPLETE] Strategy execution complete
+2025-12-03 18:58:56,164 - INFO - Disconnecting from 127.0.0.1:7497, 582 B sent in 16 messages, 22.8 kB received in 285 messages, session time 9.55 s.
+2025-12-03 18:58:56,164 - INFO - Disconnecting
+2025-12-03 18:58:56,165 - INFO - [DISCONNECT] Disconnected from Interactive Brokers
+2025-12-03 18:58:56,166 - INFO - Disconnected.
+2025-12-03 18:59:16,589 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-03 18:59:16,590 - INFO - Connected
+2025-12-03 18:59:16,596 - INFO - Logged on to server version 176
+2025-12-03 18:59:16,606 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-03 18:59:16,606 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:hfarm
+2025-12-03 18:59:16,607 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:jfarm
+2025-12-03 18:59:16,607 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-03 18:59:16,607 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-03 18:59:16,607 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-03 18:59:16,607 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-03 18:59:16,608 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-03 18:59:16,608 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:euhmds
+2025-12-03 18:59:16,608 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:fundfarm
+2025-12-03 18:59:16,608 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-03 18:59:16,608 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-03 18:59:16,609 - INFO - API connection ready
+2025-12-03 18:59:16,713 - INFO - Synchronization complete
+2025-12-03 18:59:16,714 - INFO - [OK] Connected to IB at 127.0.0.1:7497
+2025-12-03 18:59:16,714 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-03 18:59:16,714 - INFO - [EQUITY] Account Equity: €1,001,855.84 EUR ≈ $1,082,004.31 USD (converted)
+2025-12-03 18:59:16,715 - INFO - [POSITIONS] No active positions
+2025-12-03 18:59:16,715 - INFO - 
+2025-12-03 18:59:16,715 - INFO - ================================================================================
+2025-12-03 18:59:16,715 - INFO - [START] US TREASURY ARBITRAGE BOT - DYNAMIC POSITION SIZING
+2025-12-03 18:59:16,715 - INFO - ================================================================================
+2025-12-03 18:59:16,716 - INFO - Account Equity: $1,082,004.31
+2025-12-03 18:59:16,716 - INFO - Position Range: 1.0% - 5.0%
+2025-12-03 18:59:16,716 - INFO - Arbitrage Threshold: 0.3%
+2025-12-03 18:59:16,716 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-03 18:59:16,716 - INFO - ================================================================================
+2025-12-03 18:59:16,716 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-03 18:59:16,716 - INFO - [EQUITY] Account Equity: €1,001,855.84 EUR ≈ $1,082,004.31 USD (converted)
+2025-12-03 18:59:16,716 - INFO - [POSITIONS] No active positions
+2025-12-03 18:59:16,716 - INFO - 
+[STEP 1] Scanning US Treasury bonds...
+2025-12-03 18:59:16,717 - INFO - [SCAN] Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-03 18:59:16,800 - INFO - [FOUND] ZNZ5 - 10-Year U.S. Treasury Note - Expiry: 20251219
+2025-12-03 18:59:16,887 - INFO - [FOUND] ZBZ5 - 30-Year U.S. Treasury Bond - Expiry: 20251219
+2025-12-03 18:59:16,975 - INFO - [FOUND] ZFZ5 - 5-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-03 18:59:17,064 - INFO - [FOUND] ZTZ5 - 2-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-03 18:59:17,064 - INFO - [SCAN COMPLETE] Found 4 US Treasury futures contracts
+2025-12-03 18:59:17,064 - INFO - 
+[STEP 2] Analyzing 4 bonds...
+2025-12-03 18:59:17,067 - ERROR - Error 10168, reqId 7: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-03 18:59:19,070 - WARNING - [WARNING] No valid price for ZNZ5
+2025-12-03 18:59:19,073 - ERROR - Error 10168, reqId 8: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-03 18:59:21,080 - WARNING - [WARNING] No valid price for ZBZ5
+2025-12-03 18:59:21,082 - ERROR - Error 10168, reqId 9: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-03 18:59:23,094 - WARNING - [WARNING] No valid price for ZFZ5
+2025-12-03 18:59:23,098 - ERROR - Error 10168, reqId 10: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-03 18:59:25,101 - WARNING - [WARNING] No valid price for ZTZ5
+2025-12-03 18:59:25,102 - INFO - 
+2025-12-03 18:59:25,103 - INFO - ================================================================================
+2025-12-03 18:59:25,103 - INFO - [SUMMARY] OPPORTUNITY SUMMARY
+2025-12-03 18:59:25,103 - INFO - ================================================================================
+2025-12-03 18:59:25,104 - INFO - 
+[INFO] No tradeable opportunities found with current criteria
+2025-12-03 18:59:25,104 - INFO - 
+[COMPLETE] Strategy execution complete
+2025-12-03 18:59:25,105 - INFO - Disconnecting from 127.0.0.1:7497, 582 B sent in 16 messages, 22.9 kB received in 285 messages, session time 8.52 s.
+2025-12-03 18:59:25,105 - INFO - Disconnecting
+2025-12-03 18:59:25,106 - INFO - [DISCONNECT] Disconnected from Interactive Brokers
+2025-12-03 18:59:25,106 - INFO - Disconnected.
+2025-12-03 19:03:06,973 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-03 19:03:06,974 - INFO - Connected
+2025-12-03 19:03:06,977 - INFO - Logged on to server version 176
+2025-12-03 19:03:06,978 - INFO - API connection ready
+2025-12-03 19:03:06,979 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-03 19:03:06,979 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:hfarm
+2025-12-03 19:03:06,979 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:jfarm
+2025-12-03 19:03:06,979 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-03 19:03:06,979 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-03 19:03:06,979 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-03 19:03:06,980 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-03 19:03:06,980 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-03 19:03:06,980 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:euhmds
+2025-12-03 19:03:06,980 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:fundfarm
+2025-12-03 19:03:06,980 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-03 19:03:06,980 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-03 19:03:07,290 - INFO - Warning 2108, reqId -1: La connexion de donn\u00e9es de march\u00e9 est inactive mais disponible sur demande.hfarm
+2025-12-03 19:03:07,291 - INFO - Warning 2108, reqId -1: La connexion de donn\u00e9es de march\u00e9 est inactive mais disponible sur demande.jfarm
+2025-12-03 19:03:07,291 - INFO - Warning 2108, reqId -1: La connexion de donn\u00e9es de march\u00e9 est inactive mais disponible sur demande.hfarm
+2025-12-03 19:03:07,292 - INFO - Warning 2108, reqId -1: La connexion de donn\u00e9es de march\u00e9 est inactive mais disponible sur demande.jfarm
+2025-12-03 19:03:07,383 - INFO - Synchronization complete
+2025-12-03 19:03:07,383 - INFO - [OK] Connected to IB at 127.0.0.1:7497
+2025-12-03 19:03:07,384 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-03 19:03:07,384 - INFO - [EQUITY] Account Equity: €1,001,855.84 EUR ≈ $1,082,004.31 USD (converted)
+2025-12-03 19:03:07,384 - INFO - [POSITIONS] No active positions
+2025-12-03 19:03:07,384 - INFO - 
+2025-12-03 19:03:07,385 - INFO - ================================================================================
+2025-12-03 19:03:07,385 - INFO - [START] US TREASURY ARBITRAGE BOT - DYNAMIC POSITION SIZING
+2025-12-03 19:03:07,385 - INFO - ================================================================================
+2025-12-03 19:03:07,385 - INFO - Account Equity: $1,082,004.31
+2025-12-03 19:03:07,385 - INFO - Position Range: 1.0% - 5.0%
+2025-12-03 19:03:07,386 - INFO - Arbitrage Threshold: 0.3%
+2025-12-03 19:03:07,386 - INFO - Auto-Trade: DISABLED (Scan Only)
+2025-12-03 19:03:07,386 - INFO - ================================================================================
+2025-12-03 19:03:07,386 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-03 19:03:07,386 - INFO - [EQUITY] Account Equity: €1,001,855.84 EUR ≈ $1,082,004.31 USD (converted)
+2025-12-03 19:03:07,386 - INFO - [POSITIONS] No active positions
+2025-12-03 19:03:07,386 - INFO - 
+[STEP 1] Scanning US Treasury bonds...
+2025-12-03 19:03:07,386 - INFO - [SCAN] Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-03 19:03:07,482 - INFO - [FOUND] ZNZ5 - 10-Year U.S. Treasury Note - Expiry: 20251219
+2025-12-03 19:03:07,568 - INFO - [FOUND] ZBZ5 - 30-Year U.S. Treasury Bond - Expiry: 20251219
+2025-12-03 19:03:07,653 - INFO - [FOUND] ZFZ5 - 5-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-03 19:03:07,743 - INFO - [FOUND] ZTZ5 - 2-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-03 19:03:07,743 - INFO - [SCAN COMPLETE] Found 4 US Treasury futures contracts
+2025-12-03 19:03:07,744 - INFO - 
+[STEP 2] Analyzing 4 bonds...
+2025-12-03 19:03:07,745 - ERROR - Error 10168, reqId 7: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-03 19:03:09,753 - WARNING - [WARNING] No valid price for ZNZ5
+2025-12-03 19:03:09,759 - ERROR - Error 10168, reqId 8: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-03 19:03:11,758 - WARNING - [WARNING] No valid price for ZBZ5
+2025-12-03 19:03:11,762 - ERROR - Error 10168, reqId 9: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-03 19:03:13,776 - WARNING - [WARNING] No valid price for ZFZ5
+2025-12-03 19:03:13,780 - ERROR - Error 10168, reqId 10: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-03 19:03:15,780 - WARNING - [WARNING] No valid price for ZTZ5
+2025-12-03 19:03:15,781 - INFO - 
+2025-12-03 19:03:15,782 - INFO - ================================================================================
+2025-12-03 19:03:15,782 - INFO - [SUMMARY] OPPORTUNITY SUMMARY
+2025-12-03 19:03:15,783 - INFO - ================================================================================
+2025-12-03 19:03:15,784 - INFO - 
+[INFO] No tradeable opportunities found with current criteria
+2025-12-03 19:03:15,785 - INFO - 
+[COMPLETE] Strategy execution complete
+2025-12-03 19:03:15,785 - INFO - Disconnecting from 127.0.0.1:7497, 582 B sent in 16 messages, 23.3 kB received in 289 messages, session time 8.81 s.
+2025-12-03 19:03:15,786 - INFO - Disconnecting
+2025-12-03 19:03:15,787 - INFO - [DISCONNECT] Disconnected from Interactive Brokers
+2025-12-03 19:03:15,787 - INFO - Disconnected.
+2025-12-04 13:35:47,938 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-04 13:35:49,963 - INFO - Disconnecting
+2025-12-04 13:35:49,963 - ERROR - API connection failed: ConnectionRefusedError(22, 'Le système distant a refusé la connexion réseau', None, 1225, None)
+2025-12-04 13:35:49,963 - ERROR - Make sure API port on TWS/IBG is open
+2025-12-04 13:35:49,963 - ERROR - [ERROR] Failed to connect to IB: [WinError 1225] Le système distant a refusé la connexion réseau
+2025-12-04 13:35:49,963 - ERROR - [ERROR] Failed to connect to Interactive Brokers
+2025-12-04 13:35:49,964 - INFO - 
+[TROUBLESHOOTING]
+2025-12-04 13:35:49,964 - INFO - 1. Is TWS/Gateway running?
+2025-12-04 13:35:49,964 - INFO - 2. Is API enabled in TWS? (File -> Global Configuration -> API -> Settings)
+2025-12-04 13:35:49,964 - INFO - 3. Is the port correct? (7496=Live, 7497=Paper)
+2025-12-05 12:08:51,659 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-05 12:08:51,660 - INFO - Connected
+2025-12-05 12:08:51,686 - INFO - Logged on to server version 176
+2025-12-05 12:08:51,692 - INFO - API connection ready
+2025-12-05 12:08:51,694 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-05 12:08:51,694 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:hfarm
+2025-12-05 12:08:51,694 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:jfarm
+2025-12-05 12:08:51,695 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-05 12:08:51,695 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-05 12:08:51,695 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-05 12:08:51,695 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-05 12:08:51,695 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-05 12:08:51,695 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:euhmds
+2025-12-05 12:08:51,695 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:fundfarm
+2025-12-05 12:08:51,695 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-05 12:08:51,696 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-05 12:08:51,999 - INFO - Synchronization complete
+2025-12-05 12:08:51,999 - INFO - [OK] Connected to IB at 127.0.0.1:7497
+2025-12-05 12:08:51,999 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-05 12:08:51,999 - INFO - [EQUITY] Account Equity: €1,001,945.21 EUR ≈ $1,082,100.83 USD (converted)
+2025-12-05 12:08:52,000 - INFO - [POSITIONS] No active positions
+2025-12-05 12:08:52,000 - INFO - 
+2025-12-05 12:08:52,000 - INFO - ================================================================================
+2025-12-05 12:08:52,000 - INFO - [START] US TREASURY ARBITRAGE BOT - DYNAMIC POSITION SIZING
+2025-12-05 12:08:52,001 - INFO - ================================================================================
+2025-12-05 12:08:52,001 - INFO - Account Equity: $1,082,100.83
+2025-12-05 12:08:52,001 - INFO - Position Range: 1.0% - 5.0%
+2025-12-05 12:08:52,001 - INFO - Arbitrage Threshold: 0.3%
+2025-12-05 12:08:52,001 - INFO - Auto-Trade: ENABLED
+2025-12-05 12:08:52,001 - INFO - ================================================================================
+2025-12-05 12:08:52,001 - INFO - [ACCOUNT] Account Number: DUN679493
+2025-12-05 12:08:52,001 - INFO - [EQUITY] Account Equity: €1,001,945.21 EUR ≈ $1,082,100.83 USD (converted)
+2025-12-05 12:08:52,001 - INFO - [POSITIONS] No active positions
+2025-12-05 12:08:52,001 - INFO - 
+[STEP 1] Scanning US Treasury bonds...
+2025-12-05 12:08:52,001 - INFO - [SCAN] Scanning US Treasury futures (ZN, ZB, ZT, ZF)...
+2025-12-05 12:08:52,341 - INFO - [FOUND] ZNZ5 - 10-Year U.S. Treasury Note - Expiry: 20251219
+2025-12-05 12:08:52,675 - INFO - [FOUND] ZBZ5 - 30-Year U.S. Treasury Bond - Expiry: 20251219
+2025-12-05 12:08:52,849 - INFO - [FOUND] ZFZ5 - 5-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-05 12:08:53,184 - INFO - [FOUND] ZTZ5 - 2-Year U.S. Treasury Note - Expiry: 20251231
+2025-12-05 12:08:53,185 - INFO - [SCAN COMPLETE] Found 4 US Treasury futures contracts
+2025-12-05 12:08:53,185 - INFO - 
+[STEP 2] Analyzing 4 bonds...
+2025-12-05 12:08:53,323 - ERROR - Error 354, reqId 7: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZN DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 12:08:55,200 - WARNING - [WARNING] No valid price for ZNZ5
+2025-12-05 12:08:55,317 - ERROR - Error 354, reqId 8: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZB DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 12:08:57,203 - WARNING - [WARNING] No valid price for ZBZ5
+2025-12-05 12:08:57,321 - ERROR - Error 354, reqId 9: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZF DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-05 12:08:59,215 - WARNING - [WARNING] No valid price for ZFZ5
+2025-12-05 12:08:59,323 - ERROR - Error 354, reqId 10: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZT DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-05 12:09:01,227 - WARNING - [WARNING] No valid price for ZTZ5
+2025-12-05 12:09:01,227 - INFO - 
+2025-12-05 12:09:01,228 - INFO - ================================================================================
+2025-12-05 12:09:01,228 - INFO - [SUMMARY] OPPORTUNITY SUMMARY
+2025-12-05 12:09:01,229 - INFO - ================================================================================
+2025-12-05 12:09:01,229 - INFO - 
+[INFO] No tradeable opportunities found with current criteria
+2025-12-05 12:09:01,230 - INFO - 
+[COMPLETE] Strategy execution complete
+2025-12-05 12:09:01,230 - INFO - Disconnecting from 127.0.0.1:7497, 582 B sent in 16 messages, 22.8 kB received in 285 messages, session time 9.57 s.
+2025-12-05 12:09:01,231 - INFO - Disconnecting
+2025-12-05 12:09:01,232 - INFO - [DISCONNECT] Disconnected from Interactive Brokers
+2025-12-05 12:09:01,232 - INFO - Disconnected.
+2025-12-05 12:57:40,679 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-05 12:57:40,679 - INFO - Connected
+2025-12-05 12:57:40,716 - INFO - Logged on to server version 176
+2025-12-05 12:57:40,729 - INFO - API connection ready
+2025-12-05 12:57:40,746 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-05 12:57:40,746 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-05 12:57:40,746 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-05 12:57:40,746 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-05 12:57:40,746 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-05 12:57:40,746 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-05 12:57:40,746 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-05 12:57:40,746 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-05 12:57:41,047 - INFO - Synchronization complete
+2025-12-05 12:57:41,047 - INFO - [CONNECTED] Connected to IB TWS at 127.0.0.1:7497
+2025-12-05 12:57:41,047 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 12:57:41,047 - INFO - 
+================================================================================
+2025-12-05 12:57:41,047 - INFO - [BOT START] Continuous Treasury Arbitrage Bot
+2025-12-05 12:57:41,047 - INFO - ================================================================================
+2025-12-05 12:57:41,047 - INFO - Scan Interval: 5s (0.1 minutes)
+2025-12-05 12:57:41,047 - INFO - Arbitrage Threshold: 0.01%
+2025-12-05 12:57:41,047 - INFO - Position Range: 1-5% of equity
+2025-12-05 12:57:41,047 - INFO - ================================================================================
+2025-12-05 12:57:41,063 - INFO - 
+[SCAN #1] 2025-12-05 12:57:41
+2025-12-05 12:57:41,063 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 12:57:50,659 - INFO - [YIELDS FETCHED] 2Y: 4.5%, 10Y: 4.35%, 30Y: 4.55%
+2025-12-05 12:57:50,659 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 12:57:50,659 - INFO - [PARAMS] Coupon: 4.35%, Maturity: 0.1Y
+2025-12-05 12:57:50,876 - ERROR - Error 354, reqId 4: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZN DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 12:57:52,685 - ERROR - [ERROR] Analysis failed for ZNZ5: cannot convert float NaN to integer
+2025-12-05 12:58:03,980 - WARNING - [WARNING] Could not fetch live yields: HTTPSConnectionPool(host='home.treasury.gov', port=443): Read timed out. (read timeout=10)
+2025-12-05 12:58:03,980 - INFO - [CONTRACT] ZBZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 12:58:03,980 - INFO - [PARAMS] Coupon: 4.55%, Maturity: 0.1Y
+2025-12-05 12:58:03,984 - ERROR - Error 10168, reqId 6: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 12:58:05,982 - ERROR - [ERROR] Analysis failed for ZBZ5: cannot convert float NaN to integer
+2025-12-05 12:58:16,582 - INFO - [YIELDS FETCHED] 2Y: 4.5%, 10Y: 4.35%, 30Y: 4.55%
+2025-12-05 12:58:16,582 - INFO - [CONTRACT] ZFZ5 - Expiry: 2025-12-31 (25 days)
+2025-12-05 12:58:16,582 - INFO - [PARAMS] Coupon: 4.20%, Maturity: 0.1Y
+2025-12-05 12:58:16,717 - ERROR - Error 354, reqId 8: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZF DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-05 12:58:18,592 - ERROR - [ERROR] Analysis failed for ZFZ5: cannot convert float NaN to integer
+2025-12-05 12:58:28,379 - INFO - [YIELDS FETCHED] 2Y: 4.5%, 10Y: 4.35%, 30Y: 4.55%
+2025-12-05 12:58:28,379 - INFO - [CONTRACT] ZTZ5 - Expiry: 2025-12-31 (25 days)
+2025-12-05 12:58:28,379 - INFO - [PARAMS] Coupon: 4.50%, Maturity: 0.1Y
+2025-12-05 12:58:28,536 - ERROR - Error 354, reqId 10: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZT DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-05 12:58:30,383 - ERROR - [ERROR] Analysis failed for ZTZ5: cannot convert float NaN to integer
+2025-12-05 12:58:31,396 - INFO - 
+[SLEEP] Next scan in 5s...
+2025-12-05 12:58:36,405 - INFO - 
+[SCAN #2] 2025-12-05 12:58:36
+2025-12-05 12:58:36,405 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 12:58:46,673 - WARNING - [WARNING] Could not fetch live yields: HTTPSConnectionPool(host='home.treasury.gov', port=443): Read timed out. (read timeout=10)
+2025-12-05 12:58:46,673 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 12:58:46,673 - INFO - [PARAMS] Coupon: 4.35%, Maturity: 0.1Y
+2025-12-05 12:58:46,680 - ERROR - Error 10168, reqId 12: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 12:58:48,690 - ERROR - [ERROR] Analysis failed for ZNZ5: cannot convert float NaN to integer
+2025-12-05 12:58:59,173 - INFO - [YIELDS FETCHED] 2Y: 4.5%, 10Y: 4.35%, 30Y: 4.55%
+2025-12-05 12:58:59,173 - INFO - [CONTRACT] ZBZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 12:58:59,184 - INFO - [PARAMS] Coupon: 4.55%, Maturity: 0.1Y
+2025-12-05 12:58:59,186 - ERROR - Error 10168, reqId 14: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 12:59:01,194 - ERROR - [ERROR] Analysis failed for ZBZ5: cannot convert float NaN to integer
+2025-12-05 12:59:11,848 - INFO - [YIELDS FETCHED] 2Y: 4.5%, 10Y: 4.35%, 30Y: 4.55%
+2025-12-05 12:59:11,849 - INFO - [CONTRACT] ZFZ5 - Expiry: 2025-12-31 (25 days)
+2025-12-05 12:59:11,849 - INFO - [PARAMS] Coupon: 4.20%, Maturity: 0.1Y
+2025-12-05 12:59:11,964 - ERROR - Error 354, reqId 16: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZF DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678694, symbol='ZF', lastTradeDateOrContractMonth='20251231', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZFZ5', tradingClass='ZF')
+2025-12-05 12:59:13,861 - ERROR - [ERROR] Analysis failed for ZFZ5: cannot convert float NaN to integer
+2025-12-05 12:59:25,136 - WARNING - [WARNING] Could not fetch live yields: HTTPSConnectionPool(host='home.treasury.gov', port=443): Read timed out. (read timeout=10)
+2025-12-05 12:59:25,137 - INFO - [CONTRACT] ZTZ5 - Expiry: 2025-12-31 (25 days)
+2025-12-05 12:59:25,138 - INFO - [PARAMS] Coupon: 4.50%, Maturity: 0.1Y
+2025-12-05 12:59:25,298 - ERROR - Error 354, reqId 18: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZT DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=772678700, symbol='ZT', lastTradeDateOrContractMonth='20251231', multiplier='2000', exchange='CBOT', currency='USD', localSymbol='ZTZ5', tradingClass='ZT')
+2025-12-05 12:59:27,153 - ERROR - [ERROR] Analysis failed for ZTZ5: cannot convert float NaN to integer
+2025-12-05 12:59:28,163 - INFO - 
+[SLEEP] Next scan in 5s...
+2025-12-05 12:59:33,166 - INFO - 
+[SCAN #3] 2025-12-05 12:59:33
+2025-12-05 12:59:33,166 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 12:59:42,658 - INFO - [YIELDS FETCHED] 2Y: 4.5%, 10Y: 4.35%, 30Y: 4.55%
+2025-12-05 12:59:42,658 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 12:59:42,658 - INFO - [PARAMS] Coupon: 4.35%, Maturity: 0.1Y
+2025-12-05 12:59:42,658 - INFO - 
+[STOPPED] Bot stopped by user
+2025-12-05 12:59:42,658 - INFO - Disconnecting from 127.0.0.1:7497, 1.17 kB sent in 26 messages, 35.4 kB received in 309 messages, session time 122 s.
+2025-12-05 12:59:42,658 - INFO - Disconnecting
+2025-12-05 12:59:42,658 - INFO - [DISCONNECTED] Bot shutdown complete
+2025-12-05 12:59:42,658 - INFO - Disconnected.
+2025-12-05 13:03:04,198 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-05 13:03:04,198 - INFO - Connected
+2025-12-05 13:03:04,205 - INFO - Logged on to server version 176
+2025-12-05 13:03:04,205 - INFO - API connection ready
+2025-12-05 13:03:04,209 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-05 13:03:04,209 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-05 13:03:04,209 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-05 13:03:04,210 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-05 13:03:04,210 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-05 13:03:04,211 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-05 13:03:04,211 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-05 13:03:04,211 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-05 13:03:04,410 - INFO - Synchronization complete
+2025-12-05 13:03:04,410 - INFO - [CONNECTED] Connected to IB TWS at 127.0.0.1:7497
+2025-12-05 13:03:04,410 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:03:04,410 - INFO - 
+================================================================================
+2025-12-05 13:03:04,410 - INFO - [BOT START] Continuous Treasury Arbitrage Bot
+2025-12-05 13:03:04,410 - INFO - ================================================================================
+2025-12-05 13:03:04,410 - INFO - Scan Interval: 300s (5.0 minutes)
+2025-12-05 13:03:04,410 - INFO - Arbitrage Threshold: 0.3%
+2025-12-05 13:03:04,410 - INFO - Position Range: 1-5% of equity
+2025-12-05 13:03:04,410 - INFO - ================================================================================
+2025-12-05 13:03:04,410 - INFO - 
+[SCAN #1] 2025-12-05 13:03:04
+2025-12-05 13:03:04,410 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:03:14,704 - WARNING - [WARNING] Could not fetch live yields: HTTPSConnectionPool(host='home.treasury.gov', port=443): Read timed out. (read timeout=10)
+2025-12-05 13:03:14,704 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:03:14,705 - INFO - [PARAMS] Coupon: 4.35%, Maturity: 0.1Y
+2025-12-05 13:03:14,708 - ERROR - Error 10168, reqId 4: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:03:16,718 - INFO - [DELAYED DATA] Real-time not available for ZNZ5, requesting delayed data...
+2025-12-05 13:03:16,721 - ERROR - Error 300, reqId 4: Can't find EId with tickerId:4
+2025-12-05 13:03:17,507 - ERROR - Error 354, reqId 5: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZN DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:03:20,249 - ERROR - [ERROR] Analysis failed for ZNZ5: 'Ticker' object has no attribute 'delayedLast'
+2025-12-05 13:03:29,746 - INFO - [YIELDS FETCHED] 2Y: 4.5%, 10Y: 4.35%, 30Y: 4.55%
+2025-12-05 13:03:29,747 - INFO - [CONTRACT] ZBZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:03:29,747 - INFO - [PARAMS] Coupon: 4.55%, Maturity: 0.1Y
+2025-12-05 13:03:29,748 - ERROR - Error 10168, reqId 7: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:03:31,757 - INFO - [DELAYED DATA] Real-time not available for ZBZ5, requesting delayed data...
+2025-12-05 13:03:31,758 - ERROR - Error 300, reqId 7: Can't find EId with tickerId:7
+2025-12-05 13:03:32,271 - ERROR - Error 10168, reqId 8: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:03:35,273 - ERROR - [ERROR] Analysis failed for ZBZ5: 'Ticker' object has no attribute 'delayedLast'
+2025-12-05 13:03:36,282 - INFO - 
+[SLEEP] Next scan in 300s...
+2025-12-05 13:03:44,683 - INFO - 
+[STOPPED] Bot stopped by user
+2025-12-05 13:03:44,684 - INFO - Disconnecting from 127.0.0.1:7497, 521 B sent in 16 messages, 17.8 kB received in 275 messages, session time 40.5 s.
+2025-12-05 13:03:44,685 - INFO - Disconnecting
+2025-12-05 13:03:44,685 - INFO - [DISCONNECTED] Bot shutdown complete
+2025-12-05 13:03:44,686 - INFO - Disconnected.
+2025-12-05 13:05:19,334 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-05 13:05:19,335 - INFO - Connected
+2025-12-05 13:05:19,337 - INFO - Logged on to server version 176
+2025-12-05 13:05:19,337 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-05 13:05:19,338 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-05 13:05:19,338 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-05 13:05:19,338 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-05 13:05:19,338 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-05 13:05:19,338 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-05 13:05:19,338 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-05 13:05:19,339 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-05 13:05:19,339 - INFO - API connection ready
+2025-12-05 13:05:19,441 - INFO - Synchronization complete
+2025-12-05 13:05:19,441 - INFO - [CONNECTED] Connected to IB TWS at 127.0.0.1:7497
+2025-12-05 13:05:19,442 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:05:19,442 - INFO - 
+================================================================================
+2025-12-05 13:05:19,442 - INFO - [BOT START] Continuous Treasury Arbitrage Bot
+2025-12-05 13:05:19,442 - INFO - ================================================================================
+2025-12-05 13:05:19,442 - INFO - Scan Interval: 300s (5.0 minutes)
+2025-12-05 13:05:19,443 - INFO - Arbitrage Threshold: 0.3%
+2025-12-05 13:05:19,443 - INFO - Position Range: 1-5% of equity
+2025-12-05 13:05:19,443 - INFO - ================================================================================
+2025-12-05 13:05:19,443 - INFO - 
+[SCAN #1] 2025-12-05 13:05:19
+2025-12-05 13:05:19,443 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:05:29,732 - WARNING - [WARNING] Could not fetch live yields: HTTPSConnectionPool(host='home.treasury.gov', port=443): Read timed out. (read timeout=10)
+2025-12-05 13:05:29,734 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:05:29,736 - INFO - [PARAMS] Coupon: 4.35%, Maturity: 0.1Y
+2025-12-05 13:05:29,740 - ERROR - Error 10168, reqId 4: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:05:31,753 - INFO - [DELAYED DATA] Real-time not available for ZNZ5, requesting delayed data...
+2025-12-05 13:05:31,755 - ERROR - Error 300, reqId 4: Can't find EId with tickerId:4
+2025-12-05 13:05:32,267 - ERROR - Error 10168, reqId 5: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:05:33,564 - ERROR - Peer closed connection.
+2025-12-05 13:05:35,281 - ERROR - [ERROR] Analysis failed for ZNZ5: 'NoneType' object has no attribute 'last'
+2025-12-05 13:05:36,295 - ERROR - [ERROR] Failed to get ZB contract: Not connected
+2025-12-05 13:05:37,312 - INFO - 
+[SLEEP] Next scan in 300s...
+2025-12-05 13:10:37,323 - INFO - 
+[SCAN #2] 2025-12-05 13:10:37
+2025-12-05 13:10:37,323 - ERROR - [ERROR] Failed to get ZN contract: Not connected
+2025-12-05 13:10:38,329 - ERROR - [ERROR] Failed to get ZB contract: Not connected
+2025-12-05 13:10:39,346 - INFO - 
+[SLEEP] Next scan in 300s...
+2025-12-05 13:15:39,361 - INFO - 
+[SCAN #3] 2025-12-05 13:15:39
+2025-12-05 13:15:39,361 - ERROR - [ERROR] Failed to get ZN contract: Not connected
+2025-12-05 13:15:40,362 - ERROR - [ERROR] Failed to get ZB contract: Not connected
+2025-12-05 13:15:41,363 - INFO - 
+[SLEEP] Next scan in 300s...
+2025-12-05 13:17:15,841 - INFO - 
+[STOPPED] Bot stopped by user
+2025-12-05 13:17:15,841 - INFO - [DISCONNECTED] Bot shutdown complete
+2025-12-05 13:18:02,931 - INFO - Connecting to 127.0.0.1:7497 with clientId 1...
+2025-12-05 13:18:02,932 - INFO - Connected
+2025-12-05 13:18:02,957 - INFO - Logged on to server version 176
+2025-12-05 13:18:02,963 - INFO - API connection ready
+2025-12-05 13:18:02,966 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm.nj
+2025-12-05 13:18:02,966 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfuture
+2025-12-05 13:18:02,967 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usopt.nj
+2025-12-05 13:18:02,967 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:cashfarm
+2025-12-05 13:18:02,967 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:eufarmnj
+2025-12-05 13:18:02,967 - INFO - Warning 2104, reqId -1: La connexion de donn\u00e9es de march\u00e9 est OK:usfarm
+2025-12-05 13:18:02,968 - INFO - Warning 2106, reqId -1: La connexion de donn\u00e9es HMDS est OK:ushmds
+2025-12-05 13:18:02,968 - INFO - Warning 2158, reqId -1: La connexion de la batterie de serveurs Sec-def est OK:secdefnj
+2025-12-05 13:18:03,370 - INFO - Synchronization complete
+2025-12-05 13:18:03,371 - INFO - [CONNECTED] Connected to IB TWS at 127.0.0.1:7497
+2025-12-05 13:18:03,371 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:18:03,371 - INFO - 
+================================================================================
+2025-12-05 13:18:03,371 - INFO - [BOT START] Continuous Treasury Arbitrage Bot
+2025-12-05 13:18:03,371 - INFO - ================================================================================
+2025-12-05 13:18:03,372 - INFO - Scan Interval: 5s (0.1 minutes)
+2025-12-05 13:18:03,372 - INFO - Arbitrage Threshold: 0.01%
+2025-12-05 13:18:03,372 - INFO - Position Range: 1-5% of equity
+2025-12-05 13:18:03,372 - INFO - ================================================================================
+2025-12-05 13:18:03,372 - INFO - 
+[SCAN #1] 2025-12-05 13:18:03
+2025-12-05 13:18:03,372 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:18:03,544 - INFO - [FETCHING] Real auction data for 10Y Treasury...
+2025-12-05 13:18:04,167 - WARNING - [WARNING] Could not fetch auction data for 10Y: could not convert string to float: ''
+2025-12-05 13:18:04,168 - INFO - [FALLBACK] Using estimated coupon for 10Y based on yields
+2025-12-05 13:18:09,385 - WARNING - [WARNING] Could not fetch FRED yields: HTTPSConnectionPool(host='fred.stlouisfed.org', port=443): Read timed out. (read timeout=5)
+2025-12-05 13:18:09,386 - INFO - [FALLBACK] Using default treasury yields
+2025-12-05 13:18:09,388 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:18:09,389 - INFO - [PARAMS] Coupon: 4.35%, Maturity: 0.1Y
+2025-12-05 13:18:09,571 - ERROR - Error 354, reqId 4: Requested market data is not subscribed.Des donn\u00e9es de march\u00e9 en diff\u00e9r\u00e9 sont disponibles.ZN DEC'25/TOP/ALL, contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:18:11,407 - INFO - [DELAYED DATA] Real-time not available for ZNZ5, trying delayed data...
+2025-12-05 13:18:11,411 - ERROR - Error 300, reqId 4: Can't find EId with tickerId:4
+2025-12-05 13:18:11,926 - ERROR - Error 10168, reqId 5: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:18:14,927 - WARNING - [NO MARKET DATA] ZNZ5 - Using estimated price from fundamentals
+2025-12-05 13:18:14,928 - INFO - [ESTIMATED PRICE] ZNZ5: $100.00 (based on NPV calculation)
+2025-12-05 13:18:14,928 - INFO - [PRICE SOURCE] ZNZ5: $100.0000 (Estimated (NPV))
+2025-12-05 13:18:14,928 - WARNING - [WARNING] Trading disabled for ZNZ5 - No real market data available
+2025-12-05 13:18:14,928 - INFO - 
+================================================================================
+2025-12-05 13:18:14,929 - INFO - [ZNZ5] Analysis
+2025-12-05 13:18:14,929 - INFO - ================================================================================
+2025-12-05 13:18:14,929 - INFO - Price: $100.0000 (Estimated (NPV)) | NPV: $100.00
+2025-12-05 13:18:14,930 - INFO - Mispricing: +0.00% | Signal: HOLD
+2025-12-05 13:18:14,930 - INFO - Confidence: 0.0%
+2025-12-05 13:18:14,931 - INFO - Days to Expiry: 13
+2025-12-05 13:18:14,931 - INFO - No Trade: Low confidence (0.0%)
+2025-12-05 13:18:14,934 - ERROR - Error 300, reqId 5: Can't find EId with tickerId:5
+2025-12-05 13:18:16,014 - INFO - [FETCHING] Real auction data for 30Y Treasury...
+2025-12-05 13:18:16,604 - INFO - [AUCTION DATA] 30Y Treasury:
+2025-12-05 13:18:16,605 - INFO -   Coupon: 4.625%
+2025-12-05 13:18:16,606 - INFO -   Par Value: $100.0
+2025-12-05 13:18:16,607 - INFO -   Issue Date: 2025-12-01T00:00:00
+2025-12-05 13:18:16,607 - INFO -   Maturity: 2045-11-15T00:00:00
+2025-12-05 13:18:16,610 - INFO - [CONTRACT] ZBZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:18:16,610 - INFO - [PARAMS] Coupon: 4.62%, Maturity: 0.1Y
+2025-12-05 13:18:16,612 - ERROR - Error 10168, reqId 7: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:18:18,615 - INFO - [DELAYED DATA] Real-time not available for ZBZ5, trying delayed data...
+2025-12-05 13:18:18,617 - ERROR - Error 300, reqId 7: Can't find EId with tickerId:7
+2025-12-05 13:18:19,135 - ERROR - Error 10168, reqId 8: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:18:22,138 - WARNING - [NO MARKET DATA] ZBZ5 - Using estimated price from fundamentals
+2025-12-05 13:18:22,139 - INFO - [ESTIMATED PRICE] ZBZ5: $100.00 (based on NPV calculation)
+2025-12-05 13:18:22,139 - INFO - [PRICE SOURCE] ZBZ5: $100.0000 (Estimated (NPV))
+2025-12-05 13:18:22,139 - WARNING - [WARNING] Trading disabled for ZBZ5 - No real market data available
+2025-12-05 13:18:22,140 - INFO - 
+================================================================================
+2025-12-05 13:18:22,141 - INFO - [ZBZ5] Analysis
+2025-12-05 13:18:22,141 - INFO - ================================================================================
+2025-12-05 13:18:22,142 - INFO - Price: $100.0000 (Estimated (NPV)) | NPV: $100.00
+2025-12-05 13:18:22,142 - INFO - Mispricing: +0.00% | Signal: HOLD
+2025-12-05 13:18:22,143 - INFO - Confidence: 0.0%
+2025-12-05 13:18:22,143 - INFO - Days to Expiry: 13
+2025-12-05 13:18:22,143 - INFO - No Trade: Low confidence (0.0%)
+2025-12-05 13:18:22,146 - ERROR - Error 300, reqId 8: Can't find EId with tickerId:8
+2025-12-05 13:18:23,152 - INFO - 
+[SLEEP] Next scan in 5s...
+2025-12-05 13:18:28,163 - INFO - 
+[SCAN #2] 2025-12-05 13:18:28
+2025-12-05 13:18:28,164 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:18:28,257 - INFO - [FETCHING] Real auction data for 10Y Treasury...
+2025-12-05 13:18:28,853 - WARNING - [WARNING] Could not fetch auction data for 10Y: could not convert string to float: ''
+2025-12-05 13:18:28,854 - INFO - [FALLBACK] Using estimated coupon for 10Y based on yields
+2025-12-05 13:18:33,021 - INFO - [YIELDS FETCHED] 2Y: 3.49%, 5Y: 3.62%, 10Y: 4.06%, 30Y: 4.73%
+2025-12-05 13:18:33,022 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:18:33,022 - INFO - [PARAMS] Coupon: 4.06%, Maturity: 0.1Y
+2025-12-05 13:18:33,023 - ERROR - Error 10168, reqId 10: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:18:35,027 - INFO - [DELAYED DATA] Real-time not available for ZNZ5, trying delayed data...
+2025-12-05 13:18:35,029 - ERROR - Error 300, reqId 10: Can't find EId with tickerId:10
+2025-12-05 13:18:35,532 - ERROR - Error 10168, reqId 11: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:18:38,537 - WARNING - [NO MARKET DATA] ZNZ5 - Using estimated price from fundamentals
+2025-12-05 13:18:38,538 - INFO - [ESTIMATED PRICE] ZNZ5: $100.00 (based on NPV calculation)
+2025-12-05 13:18:38,539 - INFO - [PRICE SOURCE] ZNZ5: $100.0000 (Estimated (NPV))
+2025-12-05 13:18:38,540 - WARNING - [WARNING] Trading disabled for ZNZ5 - No real market data available
+2025-12-05 13:18:38,540 - INFO - 
+================================================================================
+2025-12-05 13:18:38,541 - INFO - [ZNZ5] Analysis
+2025-12-05 13:18:38,541 - INFO - ================================================================================
+2025-12-05 13:18:38,541 - INFO - Price: $100.0000 (Estimated (NPV)) | NPV: $100.00
+2025-12-05 13:18:38,542 - INFO - Mispricing: +0.00% | Signal: HOLD
+2025-12-05 13:18:38,542 - INFO - Confidence: 0.0%
+2025-12-05 13:18:38,543 - INFO - Days to Expiry: 13
+2025-12-05 13:18:38,543 - INFO - No Trade: Low confidence (0.0%)
+2025-12-05 13:18:38,546 - ERROR - Error 300, reqId 11: Can't find EId with tickerId:11
+2025-12-05 13:18:39,642 - INFO - [FETCHING] Real auction data for 30Y Treasury...
+2025-12-05 13:18:40,234 - INFO - [AUCTION DATA] 30Y Treasury:
+2025-12-05 13:18:40,235 - INFO -   Coupon: 4.625%
+2025-12-05 13:18:40,235 - INFO -   Par Value: $100.0
+2025-12-05 13:18:40,235 - INFO -   Issue Date: 2025-12-01T00:00:00
+2025-12-05 13:18:40,236 - INFO -   Maturity: 2045-11-15T00:00:00
+2025-12-05 13:18:40,238 - INFO - [CONTRACT] ZBZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:18:40,239 - INFO - [PARAMS] Coupon: 4.62%, Maturity: 0.1Y
+2025-12-05 13:18:40,241 - ERROR - Error 10168, reqId 13: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:18:42,246 - INFO - [DELAYED DATA] Real-time not available for ZBZ5, trying delayed data...
+2025-12-05 13:18:42,249 - ERROR - Error 300, reqId 13: Can't find EId with tickerId:13
+2025-12-05 13:18:42,764 - ERROR - Error 10168, reqId 14: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:18:45,751 - WARNING - [NO MARKET DATA] ZBZ5 - Using estimated price from fundamentals
+2025-12-05 13:18:45,753 - INFO - [ESTIMATED PRICE] ZBZ5: $100.00 (based on NPV calculation)
+2025-12-05 13:18:45,753 - INFO - [PRICE SOURCE] ZBZ5: $100.0000 (Estimated (NPV))
+2025-12-05 13:18:45,754 - WARNING - [WARNING] Trading disabled for ZBZ5 - No real market data available
+2025-12-05 13:18:45,755 - INFO - 
+================================================================================
+2025-12-05 13:18:45,755 - INFO - [ZBZ5] Analysis
+2025-12-05 13:18:45,756 - INFO - ================================================================================
+2025-12-05 13:18:45,757 - INFO - Price: $100.0000 (Estimated (NPV)) | NPV: $100.00
+2025-12-05 13:18:45,758 - INFO - Mispricing: +0.00% | Signal: HOLD
+2025-12-05 13:18:45,758 - INFO - Confidence: 0.0%
+2025-12-05 13:18:45,759 - INFO - Days to Expiry: 13
+2025-12-05 13:18:45,759 - INFO - No Trade: Low confidence (0.0%)
+2025-12-05 13:18:45,761 - ERROR - Error 300, reqId 14: Can't find EId with tickerId:14
+2025-12-05 13:18:46,768 - INFO - 
+[SLEEP] Next scan in 5s...
+2025-12-05 13:18:51,771 - INFO - 
+[SCAN #3] 2025-12-05 13:18:51
+2025-12-05 13:18:51,772 - INFO - [EQUITY] €1,001,945.21 EUR ≈ $1,082,100.83 USD
+2025-12-05 13:18:51,863 - INFO - [FETCHING] Real auction data for 10Y Treasury...
+2025-12-05 13:18:52,430 - WARNING - [WARNING] Could not fetch auction data for 10Y: could not convert string to float: ''
+2025-12-05 13:18:52,431 - INFO - [FALLBACK] Using estimated coupon for 10Y based on yields
+2025-12-05 13:18:53,209 - INFO - [YIELDS FETCHED] 2Y: 3.49%, 5Y: 3.62%, 10Y: 4.06%, 30Y: 4.73%
+2025-12-05 13:18:53,210 - INFO - [CONTRACT] ZNZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:18:53,211 - INFO - [PARAMS] Coupon: 4.06%, Maturity: 0.1Y
+2025-12-05 13:18:53,212 - ERROR - Error 10168, reqId 16: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:18:55,223 - INFO - [DELAYED DATA] Real-time not available for ZNZ5, trying delayed data...
+2025-12-05 13:18:55,226 - ERROR - Error 300, reqId 16: Can't find EId with tickerId:16
+2025-12-05 13:18:55,743 - ERROR - Error 10168, reqId 17: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327397, symbol='ZN', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZNZ5', tradingClass='ZN')
+2025-12-05 13:18:58,752 - WARNING - [NO MARKET DATA] ZNZ5 - Using estimated price from fundamentals
+2025-12-05 13:18:58,753 - INFO - [ESTIMATED PRICE] ZNZ5: $100.00 (based on NPV calculation)
+2025-12-05 13:18:58,754 - INFO - [PRICE SOURCE] ZNZ5: $100.0000 (Estimated (NPV))
+2025-12-05 13:18:58,754 - WARNING - [WARNING] Trading disabled for ZNZ5 - No real market data available
+2025-12-05 13:18:58,755 - INFO - 
+================================================================================
+2025-12-05 13:18:58,755 - INFO - [ZNZ5] Analysis
+2025-12-05 13:18:58,756 - INFO - ================================================================================
+2025-12-05 13:18:58,756 - INFO - Price: $100.0000 (Estimated (NPV)) | NPV: $100.00
+2025-12-05 13:18:58,757 - INFO - Mispricing: +0.00% | Signal: HOLD
+2025-12-05 13:18:58,757 - INFO - Confidence: 0.0%
+2025-12-05 13:18:58,758 - INFO - Days to Expiry: 13
+2025-12-05 13:18:58,759 - INFO - No Trade: Low confidence (0.0%)
+2025-12-05 13:18:58,761 - ERROR - Error 300, reqId 17: Can't find EId with tickerId:17
+2025-12-05 13:18:59,851 - INFO - [FETCHING] Real auction data for 30Y Treasury...
+2025-12-05 13:19:00,413 - INFO - [AUCTION DATA] 30Y Treasury:
+2025-12-05 13:19:00,414 - INFO -   Coupon: 4.625%
+2025-12-05 13:19:00,414 - INFO -   Par Value: $100.0
+2025-12-05 13:19:00,414 - INFO -   Issue Date: 2025-12-01T00:00:00
+2025-12-05 13:19:00,415 - INFO -   Maturity: 2045-11-15T00:00:00
+2025-12-05 13:19:00,417 - INFO - [CONTRACT] ZBZ5 - Expiry: 2025-12-19 (13 days)
+2025-12-05 13:19:00,417 - INFO - [PARAMS] Coupon: 4.62%, Maturity: 0.1Y
+2025-12-05 13:19:00,419 - ERROR - Error 10168, reqId 19: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:19:02,416 - INFO - [DELAYED DATA] Real-time not available for ZBZ5, trying delayed data...
+2025-12-05 13:19:02,419 - ERROR - Error 300, reqId 19: Can't find EId with tickerId:19
+2025-12-05 13:19:02,916 - ERROR - Error 10168, reqId 20: Pas d'abonnement aux donn\u00e9es de march\u00e9 demand\u00e9\u00e9s. Les donn\u00e9es de march\u00e9 diff\u00e9r\u00e9es ne sont pas activ\u00e9es., contract: Contract(secType='FUT', conId=770327392, symbol='ZB', lastTradeDateOrContractMonth='20251219', multiplier='1000', exchange='CBOT', currency='USD', localSymbol='ZBZ5', tradingClass='ZB')
+2025-12-05 13:19:05,919 - WARNING - [NO MARKET DATA] ZBZ5 - Using estimated price from fundamentals
+2025-12-05 13:19:05,919 - INFO - [ESTIMATED PRICE] ZBZ5: $100.00 (based on NPV calculation)
+2025-12-05 13:19:05,920 - INFO - [PRICE SOURCE] ZBZ5: $100.0000 (Estimated (NPV))
+2025-12-05 13:19:05,921 - WARNING - [WARNING] Trading disabled for ZBZ5 - No real market data available
+2025-12-05 13:19:05,921 - INFO - 
+================================================================================
+2025-12-05 13:19:05,921 - INFO - [ZBZ5] Analysis
+2025-12-05 13:19:05,922 - INFO - ================================================================================
+2025-12-05 13:19:05,922 - INFO - Price: $100.0000 (Estimated (NPV)) | NPV: $100.00
+2025-12-05 13:19:05,923 - INFO - Mispricing: +0.00% | Signal: HOLD
+2025-12-05 13:19:05,923 - INFO - Confidence: 0.0%
+2025-12-05 13:19:05,923 - INFO - Days to Expiry: 13
+2025-12-05 13:19:05,924 - INFO - No Trade: Low confidence (0.0%)
+2025-12-05 13:19:05,926 - ERROR - Error 300, reqId 20: Can't find EId with tickerId:20
+2025-12-05 13:19:06,931 - INFO - 
+[SLEEP] Next scan in 5s...
+2025-12-05 13:19:09,099 - INFO - 
+[STOPPED] Bot stopped by user
+2025-12-05 13:19:09,100 - INFO - Disconnecting from 127.0.0.1:7497, 1.41 kB sent in 38 messages, 29.3 kB received in 309 messages, session time 66.2 s.
+2025-12-05 13:19:09,100 - INFO - Disconnecting
+2025-12-05 13:19:09,101 - INFO - [DISCONNECTED] Bot shutdown complete
+2025-12-05 13:19:09,102 - INFO - Disconnected.
