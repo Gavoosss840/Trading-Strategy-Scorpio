@@ -93,6 +93,7 @@ class Backtester:
         daily_pnl_list  = []
         open_positions: List[Dict] = []
         all_trades:     List[Dict] = []
+        sl_cooldown:    Dict       = {}   # key → date after which re-entry allowed
 
         for day in idx[ZSCORE_WINDOW:]:
             day_pnl = 0.0
@@ -168,6 +169,8 @@ class Backtester:
                     })
                     all_trades.append(pos)
                     closed = True
+                    # cooldown: no re-entry for 30 calendar days
+                    sl_cooldown[key] = day + pd.Timedelta(days=30)
 
                 # SPREAD_SHORT_A entered when z < −ZSCORE_ENTRY → SL if z falls more
                 elif pos['signal'] == 'SPREAD_SHORT_A' and z_now < -ZSCORE_STOP:
@@ -178,6 +181,8 @@ class Backtester:
                     })
                     all_trades.append(pos)
                     closed = True
+                    # cooldown: no re-entry for 30 calendar days
+                    sl_cooldown[key] = day + pd.Timedelta(days=30)
 
                 if not closed:
                     still_open.append(pos)
@@ -194,6 +199,12 @@ class Backtester:
                     continue
                 key = (sr['country_a'], sr['country_b'], sr['maturity'])
                 if key in open_keys or sr['confidence'] < MIN_CONFIDENCE:
+                    continue
+                # Don't open if already at SL level (would be stopped out immediately)
+                if abs(sr['z_score']) >= ZSCORE_STOP:
+                    continue
+                # Respect post-SL cooldown
+                if sl_cooldown.get(key, pd.Timestamp.min) > day:
                     continue
 
                 mat  = sr['maturity']

@@ -209,7 +209,9 @@ class SpreadAnalyzer:
 
         mu    = float(s.iloc[-w_mean:].mean())
         sigma = float(s.iloc[-w_std:].std())
-        return float((s.iloc[-1] - mu) / sigma) if sigma > 1e-8 else 0.0
+        # Floor: at least 10bps std to prevent z-score blow-up in stable regimes
+        sigma = max(sigma, 0.10)
+        return float((s.iloc[-1] - mu) / sigma)
 
     def analyze_pair(self, ca: str, cb: str, mat: int,
                      until: Optional[pd.Timestamp] = None) -> Dict:
