@@ -2,6 +2,7 @@
 Analytics — Yield Curve, Bond Pricer, Spread Analyzer
 """
 
+import logging
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
@@ -10,6 +11,12 @@ from typing import Dict, List, Optional, Tuple
 from .config import ZSCORE_WINDOW, ZSCORE_ENTRY, ZSCORE_EXIT, SPREAD_PAIRS
 from .data import SovereignYieldFetcher
 
+logger = logging.getLogger(__name__)
+
+
+# ==============================================================================
+# YIELD CURVE
+# ==============================================================================
 
 class YieldCurveBuilder:
     """Nelson-Siegel yield curve fitted per country."""
@@ -47,12 +54,15 @@ class YieldCurveBuilder:
             b0, b1, b2, tau = p
             if tau <= 0 or b0 <= 0:
                 return 1e10
-            return np.sum((np.array([self._ns(t, b0, b1, b2, tau) for t in mats]) - obs) ** 2)
+            return np.sum(
+                (np.array([self._ns(t, b0, b1, b2, tau) for t in mats]) - obs) ** 2
+            )
 
         res = minimize(obj, [obs.mean(), obs[0] - obs[-1], 0.5, 2.0],
                        bounds=[(0.01, 20), (-15, 15), (-15, 15), (0.1, 30)],
                        method='L-BFGS-B')
-        self._params[country] = tuple(res.x) if res.success else (obs.mean(), -0.3, 0.5, 2.0)
+        self._params[country] = tuple(res.x) if res.success else \
+            (obs.mean(), -0.3, 0.5, 2.0)
 
     def fit_all(self, until: Optional[pd.Timestamp] = None):
         for c in ('US', 'DE', 'FR', 'IT', 'UK', 'JP'):
@@ -64,6 +74,10 @@ class YieldCurveBuilder:
             self.fit(country)
         return self._ns(maturity_years, *self._params[country])
 
+
+# ==============================================================================
+# BOND PRICER
+# ==============================================================================
 
 class BondPricer:
     """Full DCF bond pricer — price, modified duration, convexity, DV01."""
@@ -118,13 +132,19 @@ class BondPricer:
         }
 
 
+# ==============================================================================
+# SPREAD ANALYZER
+# ==============================================================================
+
 class SpreadAnalyzer:
     """
     Computes inter-country yield spreads and z-scores.
 
-    Signal logic:
-      z > +ZSCORE_ENTRY  → spread A-B too wide  → SHORT A / LONG B
-      z < -ZSCORE_ENTRY  → spread A-B too tight → LONG A / SHORT B
+    Signal logic (corrected):
+      Spread = yield_A − yield_B
+      z > +ZSCORE_ENTRY  →  spread too wide   →  LONG A bonds / SHORT B bonds
+                              (A cheap, B expensive relative to historical spread)
+      z < −ZSCORE_ENTRY  →  spread too tight  →  SHORT A bonds / LONG B bonds
     """
 
     def __init__(self, fetcher: SovereignYieldFetcher,
@@ -160,9 +180,6 @@ class SpreadAnalyzer:
 
     def analyze_pair(self, ca: str, cb: str, mat: int,
                      until: Optional[pd.Timestamp] = None) -> Dict:
-        import logging
-        logger = logging.getLogger(__name__)
-
         ss    = self.spread_series(ca, cb, mat, until)
         label = f'{ca}{mat}Y-{cb}{mat}Y'
 
@@ -180,28 +197,35 @@ class SpreadAnalyzer:
         sigma   = float(ss.iloc[-w:].std())
         current = float(ss.iloc[-1])
 
-        if   z >  self.z_entry: signal, ll, ls = 'SPREAD_SHORT_A', cb, ca
-        elif z < -self.z_entry: signal, ll, ls = 'SPREAD_LONG_A',  ca, cb
-        else:                    signal, ll, ls = 'HOLD', None, None
+        # ── Signal (corrected legs) ───────────────────────────────────
+        # Spread = yield_A - yield_B
+        # z > 0: A is wide (cheap) relative to B → BUY A bonds, SELL B bonds
+        # z < 0: A is tight (expensive) → SELL A bonds, BUY B bonds
+        if z > self.z_entry:
+            signal, ll, ls = 'SPREAD_LONG_A',  ca, cb   # LONG A (cheap) / SHORT B
+        elif z < -self.z_entry:
+            signal, ll, ls = 'SPREAD_SHORT_A', cb, ca   # LONG B (cheap) / SHORT A
+        else:
+            signal, ll, ls = 'HOLD', None, None
 
         z_pts = min(abs(z) / 4.0 * 50, 50.0)
         h_pts = min(len(ss) / self.window * 50, 50.0)
 
         result = {
-            'pair':            label,
-            'country_a':       ca,
-            'country_b':       cb,
-            'maturity':        mat,
-            'signal':          signal,
-            'z_score':         z,
-            'spread_current':  current,
-            'spread_mean':     mu,
-            'spread_std':      sigma,
-            'deviation_bps':   (current - mu) * 100,
-            'confidence':      z_pts + h_pts,
-            'leg_long':        ll,
-            'leg_short':       ls,
-            'n_points':        len(ss),
+            'pair':           label,
+            'country_a':      ca,
+            'country_b':      cb,
+            'maturity':       mat,
+            'signal':         signal,
+            'z_score':        z,
+            'spread_current': current,
+            'spread_mean':    mu,
+            'spread_std':     sigma,
+            'deviation_bps':  (current - mu) * 100,
+            'confidence':     z_pts + h_pts,
+            'leg_long':       ll,
+            'leg_short':      ls,
+            'n_points':       len(ss),
         }
 
         if signal not in ('HOLD', 'NO_DATA'):

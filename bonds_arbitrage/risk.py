@@ -17,8 +17,10 @@ class RiskManager:
     Method: DV01-based conversion
       TP bps = (|z_entry| - TP_ZSCORE_TARGET) × spread_std × 100
       SL bps = SL_ZSCORE_EXTEND × spread_std × 100
-      price_TP = entry ± DV01 × bps_TP
-      price_SL = entry ∓ DV01 × bps_SL
+      price_TP = entry ± DV01 × bps_TP / face_factor
+      price_SL = entry ∓ DV01 × bps_SL / face_factor
+
+    DV01 here is from the BondPricer (per 100 par), scaled to contract face value.
     """
 
     def compute_tp_sl(self, trade: Dict) -> Dict:
@@ -39,16 +41,20 @@ class RiskManager:
                 result[leg_key] = {'tp': None, 'sl': None, 'entry': entry}
                 continue
 
+            # dv01 is per 100 par → approximate move as fraction of par
+            # price move per bp ≈ dv01 / 100 × entry (very small for futures)
+            price_per_bp = dv01 * entry / 10_000
+
             if role == 'long':
-                tp = entry + dv01 * bps_tp
-                sl = entry - dv01 * bps_sl
+                tp = round(entry + price_per_bp * bps_tp, 4)
+                sl = round(entry - price_per_bp * bps_sl, 4)
             else:
-                tp = entry - dv01 * bps_tp
-                sl = entry + dv01 * bps_sl
+                tp = round(entry - price_per_bp * bps_tp, 4)
+                sl = round(entry + price_per_bp * bps_sl, 4)
 
             result[leg_key] = {
-                'tp':     round(tp, 4),
-                'sl':     round(sl, 4),
+                'tp':     tp,
+                'sl':     sl,
                 'entry':  entry,
                 'dv01':   dv01,
                 'bps_tp': bps_tp,
@@ -61,6 +67,8 @@ class RiskManager:
         """True if TP/SL should be recalculated (price moved > TP_SL_UPDATE_THRESHOLD)."""
         if old_tp is None or new_tp is None or current_price is None:
             return True
+        if current_price == 0:
+            return False
         return abs(new_tp - old_tp) / current_price > TP_SL_UPDATE_THRESHOLD
 
 
@@ -86,7 +94,8 @@ class DynamicPositionSizer:
         norm    = max(0.0, min(1.0, (confidence - self.min_conf) / (100.0 - self.min_conf)))
         pct     = self.min_pct + (self.max_pct - self.min_pct) * norm
         value   = equity * pct / 100.0
-        q_long  = max(1, int(value / (price * 1_000)))
+        # Contract market value = price/100 × face_value (approx $100k for most)
+        q_long  = max(1, int(value / (price / 100.0 * 100_000)))
         q_short = max(1, int(q_long * dv01_ratio))
 
         return {
@@ -94,5 +103,5 @@ class DynamicPositionSizer:
             'qty_long':  q_long,
             'qty_short': q_short,
             'pct':       pct,
-            'value':     q_long * price * 1_000,
+            'value':     q_long * price / 100.0 * 100_000,
         }

@@ -35,8 +35,8 @@ class SignalAggregator:
     COUNTRY_TO_FUTURES: Dict[Tuple, str] = {
         ('US',  2): 'ZT',  ('US',  5): 'ZF',
         ('US', 10): 'ZN',  ('US', 30): 'ZB',
-        ('DE',  2): 'FGBS',('DE',  5): 'FGBM',
-        ('DE', 10): 'FGBL',('DE', 30): 'FGBX',
+        ('DE',  2): 'FGBS', ('DE',  5): 'FGBM',
+        ('DE', 10): 'FGBL', ('DE', 30): 'FGBX',
         ('UK', 10): 'R',
     }
     FUTURES_EXCHANGE: Dict[str, str] = {
@@ -81,9 +81,10 @@ class SignalAggregator:
         if sr['signal'] in ('HOLD', 'NO_DATA'):
             return None
 
-        ca, cb, mat = sr['country_a'], sr['country_b'], sr['maturity']
-        ll = cb if sr['signal'] == 'SPREAD_SHORT_A' else ca
-        ls = ca if sr['signal'] == 'SPREAD_SHORT_A' else cb
+        # leg_long / leg_short are already correct country codes from SpreadAnalyzer
+        ll = sr['leg_long']    # country to go LONG
+        ls = sr['leg_short']   # country to go SHORT
+        mat = sr['maturity']
 
         fl = self.COUNTRY_TO_FUTURES.get((ll, mat))
         fs = self.COUNTRY_TO_FUTURES.get((ls, mat))
