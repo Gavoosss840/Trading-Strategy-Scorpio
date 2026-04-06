@@ -217,6 +217,8 @@ class Backtester:
         sharpe   = float(arr.mean() / arr.std() * np.sqrt(252)) \
             if arr.std() > 0 else 0.0
 
+        trading_days = [str(d.date()) for d in idx[ZSCORE_WINDOW:]]
+
         return {
             'date_from':      date_from,
             'date_to':        str(dt_to.date()),
@@ -230,7 +232,8 @@ class Backtester:
             'n_trades':       len(all_trades),
             'win_rate':       win_rate,
             'open_positions': len(open_positions),
-            'equity_curve':   equity_curve,
+            'equity_curve':   equity_curve,   # length = n_days + 1 (includes t0)
+            'equity_dates':   [''] + trading_days,
             'daily_pnl':      daily_pnl,
             'trades':         all_trades,
         }

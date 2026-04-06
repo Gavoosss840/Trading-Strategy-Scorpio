@@ -148,9 +148,17 @@ def cmd_report(html: bool = False):
 
 def cmd_backtest(date_from: str, date_to: Optional[str],
                  capital: float, html: bool):
+    from datetime import datetime as _dt
+    from .config import ZSCORE_WINDOW as _W
+    days_needed = max(
+        (_dt.today() - _dt.strptime(date_from, '%Y-%m-%d')).days + _W + 60,
+        400,
+    )
     dt_label = date_to or "today"
     print(f'\nBacktest {date_from} -> {dt_label}   capital=${capital:,.0f}')
-    fetcher, _, pricer, spread_ana, aggregator, risk_mgr = _build_context(history_days=2000)
+    print(f'  Fetching {days_needed} days of yield history...')
+    fetcher, _, pricer, spread_ana, aggregator, risk_mgr = _build_context(
+        history_days=days_needed)
     bt      = Backtester(fetcher, spread_ana, aggregator, risk_mgr, capital)
     metrics = bt.run(date_from, date_to)
     if not metrics:
