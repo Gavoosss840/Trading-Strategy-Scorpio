@@ -1,30 +1,26 @@
 """
 ================================================================================
-Bond Arbitrage Strategy — T-Bills & Corporate Bonds
+Government Bond Arbitrage Strategy
 ================================================================================
 
-Stratégie d'arbitrage obligataire en 4 étapes :
+Combinaison de deux sources d'alpha complémentaires :
 
-  STEP 1 — Theoretical Pricing
-      - Yield curve Nelson-Siegel (FRED live data)
-      - Full DCF pricing
-      - Modified Duration & Convexity
+  SIGNAL 1 — Spread Inter-pays  (signal directionnel macro)
+      - Fetch des taux souverains US / DE / UK / JP / FR / IT via FRED + ECB
+      - Calcul des spreads historiques par paire et maturité
+      - Z-score de déviation par rapport à la moyenne historique
+      - Signal quand |z| > 2 : mean-reversion attendu
 
-  STEP 2 — Credit Risk Adjustment  [Enhanced Modigliani-Miller]
-      - Altman Z-Score (early warning)
-      - Merton structural model → PD (iterative solver)
-      - LGD estimation (sector + leverage + asset coverage)
-      - Credit spread = PD × LGD / (1 − PD)
-      - APV = VU + PV(tax shield) − PV(distress) − PV(agency)
+  SIGNAL 2 — NPV / DCF  (timing et optimisation d'entrée)
+      - Courbe Nelson-Siegel par pays
+      - Pricing DCF des futures (ZN, FGBL, Gilt…)
+      - Si NPV confirme le spread signal → confidence boostée
+      - Duration / Convexity / DV01 pour le sizing
 
-  STEP 3 — Equity Cross-Check
-      - Bond-implied PD vs Merton PD from equity
-      - Equity-implied spread vs market spread
-      - Detect pricing inconsistency between bond & equity markets
-
-  STEP 4 — Mispricing Detection
-      - Alpha = Price_market − Price_fair
-      - Signal generation + dynamic position sizing
+  EXECUTION — Interactive Brokers
+      - Futures liquides : ZT/ZF/ZN/ZB (CBOT), FGBS/FGBM/FGBL/FGBX (Eurex)
+      - Position sizing dynamique 1-5% selon confidence
+      - Rollover automatique front-month
 
 ================================================================================
 """
@@ -33,14 +29,30 @@ Stratégie d'arbitrage obligataire en 4 étapes :
 # CONFIGURATION
 # ==============================================================================
 
-IB_HOST            = '127.0.0.1'
-IB_PORT            = 7497        # 7497 = Paper, 7496 = Live
-SCAN_INTERVAL      = 60          # seconds between full scans
-MIN_ALPHA_BPS      = 20          # min mispricing in basis points to trade
-MIN_CONFIDENCE     = 25.0        # min confidence score (0-100) to trade
-MIN_POSITION_PCT   = 1.0         # min position size (% of equity)
-MAX_POSITION_PCT   = 5.0         # max position size (% of equity)
-DRY_RUN            = True        # True = log orders only, False = place real orders
+IB_HOST          = '127.0.0.1'
+IB_PORT          = 7497          # 7497 = Paper, 7496 = Live
+
+ZSCORE_WINDOW    = 252           # jours pour calcul z-score (≈ 1 an)
+ZSCORE_ENTRY     = 2.0           # seuil d'entrée   |z| > 2.0
+ZSCORE_EXIT      = 0.5           # seuil de sortie  |z| < 0.5
+NPV_THRESHOLD    = 0.05          # alpha NPV minimum en % pour confirmation
+SCAN_INTERVAL    = 300           # secondes entre chaque scan (5 min)
+MIN_CONFIDENCE   = 30.0
+MIN_POSITION_PCT = 1.0
+MAX_POSITION_PCT = 5.0
+DRY_RUN          = True          # False = ordres réels
+
+# Paires à surveiller : (pays_A, pays_B, maturité_années)
+SPREAD_PAIRS = [
+    ('US', 'DE', 10),   # US 10Y vs Bund 10Y  — la paire de référence mondiale
+    ('US', 'DE',  2),   # US 2Y  vs Schatz 2Y
+    ('US', 'DE',  5),   # US 5Y  vs Bobl 5Y
+    ('US', 'UK', 10),   # US 10Y vs Gilt 10Y
+    ('US', 'JP', 10),   # US 10Y vs JGB 10Y
+    ('US', 'FR', 10),   # US 10Y vs OAT 10Y
+    ('DE', 'IT', 10),   # Bund vs BTP  — spread peripherique EU
+    ('DE', 'FR', 10),   # Bund vs OAT
+]
 
 # ==============================================================================
 # IMPORTS
@@ -49,8 +61,6 @@ DRY_RUN            = True        # True = log orders only, False = place real or
 import numpy as np
 import pandas as pd
 import requests
-import yfinance as yf
-from scipy.stats import norm
 from scipy.optimize import minimize
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
@@ -73,739 +83,692 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ==============================================================================
-# STEP 1 — YIELD CURVE & THEORETICAL PRICING
+# SOVEREIGN YIELD FETCHER
+# ==============================================================================
+
+class SovereignYieldFetcher:
+    """
+    Fetch sovereign bond yields pour US, DE, UK, JP, FR, IT.
+
+    Sources :
+    ─────────
+    • US       → FRED (daily, fiable, gratuit)
+    • EU pays  → ECB Statistical Data Warehouse API (daily)
+                 Fallback → FRED IRLTLT01XXM156N (mensuel)
+    • UK       → BoE API (daily)
+                 Fallback → FRED IRLTLT01GBM156N
+    • JP       → FRED IRLTLT01JPM156N (mensuel)
+    """
+
+    # ── FRED series IDs ────────────────────────────────────────────────
+    FRED_US: Dict[int, str] = {
+        1:  'DGS1',
+        2:  'DGS2',
+        5:  'DGS5',
+        10: 'DGS10',
+        30: 'DGS30',
+    }
+
+    FRED_INTL: Dict[str, Dict[int, str]] = {
+        # Mensuel OECD/FRED — fallback fiable
+        'DE': {2: 'IRLTST01DEM156N', 10: 'IRLTLT01DEM156N'},
+        'FR': {10: 'IRLTLT01FRM156N'},
+        'IT': {10: 'IRLTLT01ITM156N'},
+        'UK': {10: 'IRLTLT01GBM156N'},
+        'JP': {10: 'IRLTLT01JPM156N'},
+    }
+
+    # ── ECB SDW series IDs (daily) ─────────────────────────────────────
+    ECB_SERIES: Dict[str, Dict[int, str]] = {
+        'DE': {
+            2:  'YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y',
+            5:  'YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_5Y',
+            10: 'YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y',
+        },
+        'FR': {10: 'YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y'},  # zone euro proxy
+        'IT': {10: 'YC.B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y'},
+    }
+
+    def __init__(self, history_days: int = 400):
+        """
+        history_days : combien de jours d'historique fetcher
+                       (min 300 pour avoir un z-score sur 252j)
+        """
+        self.history_days = history_days
+        # Cache : {country: {maturity: pd.Series(date→yield%)}}
+        self._cache: Dict[str, Dict[int, pd.Series]] = {}
+        self.last_update: Optional[datetime] = None
+
+    # ------------------------------------------------------------------
+    def _fred_series(self, series_id: str) -> Optional[pd.Series]:
+        """Fetch une série FRED, retourne pd.Series indexed par date."""
+        start = (datetime.now() - timedelta(days=self.history_days)).strftime('%Y-%m-%d')
+        url   = f'https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}&cosd={start}'
+        try:
+            r = requests.get(url, timeout=8)
+            if r.status_code != 200:
+                return None
+            lines = r.text.strip().split('\n')
+            records = {}
+            for line in lines[1:]:
+                parts = line.split(',')
+                if len(parts) == 2 and parts[1] not in ('.', ''):
+                    try:
+                        records[pd.Timestamp(parts[0])] = float(parts[1])
+                    except ValueError:
+                        pass
+            if records:
+                return pd.Series(records).sort_index()
+        except Exception as e:
+            logger.debug(f'[FRED] {series_id}: {e}')
+        return None
+
+    def _ecb_series(self, series_key: str) -> Optional[pd.Series]:
+        """Fetch une série ECB SDW (daily)."""
+        start = (datetime.now() - timedelta(days=self.history_days)).strftime('%Y-%m-%d')
+        url   = (
+            f'https://sdw-wsrest.ecb.europa.eu/service/data/{series_key}'
+            f'?startPeriod={start}&format=csvdata'
+        )
+        try:
+            r = requests.get(url, timeout=10)
+            if r.status_code != 200:
+                return None
+            lines = r.text.strip().split('\n')
+            # Find date and obs_value columns
+            header = lines[0].split(',')
+            date_idx = next((i for i, h in enumerate(header) if 'TIME_PERIOD' in h), None)
+            val_idx  = next((i for i, h in enumerate(header) if 'OBS_VALUE'   in h), None)
+            if date_idx is None or val_idx is None:
+                return None
+            records = {}
+            for line in lines[1:]:
+                parts = line.split(',')
+                if len(parts) > max(date_idx, val_idx):
+                    try:
+                        records[pd.Timestamp(parts[date_idx])] = float(parts[val_idx])
+                    except ValueError:
+                        pass
+            if records:
+                return pd.Series(records).sort_index()
+        except Exception as e:
+            logger.debug(f'[ECB] {series_key}: {e}')
+        return None
+
+    def _boe_series(self, maturity: int = 10) -> Optional[pd.Series]:
+        """Fetch UK gilt yields from Bank of England API."""
+        # BoE series: IUDMNPY (10Y nominal)
+        series_map = {10: 'IUDMNPY', 2: 'IUDMNY2', 5: 'IUDMNY5'}
+        series_id  = series_map.get(maturity, 'IUDMNPY')
+        start = (datetime.now() - timedelta(days=self.history_days)).strftime('%d/%b/%Y')
+        url   = (
+            f'https://www.bankofengland.co.uk/boeapps/database/fromshowcolumns.asp'
+            f'?Travel=NIxRSxSUx&FromSeries=1&ToSeries=50&DAT=RNG'
+            f'&FD=1&FM=Jan&FY=2020&TD=31&TM=Dec&TY=2099'
+            f'&VFD=Y&html.x=66&html.y=26&C={series_id}&Filter=N'
+        )
+        try:
+            r = requests.get(url, timeout=10)
+            if r.status_code == 200 and 'DATE' in r.text:
+                lines  = r.text.strip().split('\n')
+                header = lines[0].split(',')
+                date_i = header.index('DATE') if 'DATE' in header else 0
+                val_i  = 1
+                records = {}
+                for line in lines[1:]:
+                    parts = line.split(',')
+                    if len(parts) >= 2:
+                        try:
+                            records[pd.Timestamp(parts[date_i])] = float(parts[val_i])
+                        except ValueError:
+                            pass
+                if records:
+                    return pd.Series(records).sort_index()
+        except Exception as e:
+            logger.debug(f'[BoE] {series_id}: {e}')
+        return None
+
+    # ------------------------------------------------------------------
+    def fetch_all(self) -> bool:
+        """Fetch toutes les séries et remplir le cache."""
+        logger.info('[YIELDS] Fetching sovereign yields…')
+        cache: Dict[str, Dict[int, pd.Series]] = {}
+
+        # ── USA ─────────────────────────────────────────────────────
+        cache['US'] = {}
+        for mat, sid in self.FRED_US.items():
+            s = self._fred_series(sid)
+            if s is not None and len(s) > 20:
+                cache['US'][mat] = s
+                logger.info(f'  US {mat}Y : {len(s)} points  last={s.iloc[-1]:.3f}%')
+
+        # ── Europe via ECB (daily), fallback FRED mensuel ────────────
+        for country in ('DE', 'FR', 'IT'):
+            cache[country] = {}
+            ecb_mats = self.ECB_SERIES.get(country, {})
+            for mat, ecb_key in ecb_mats.items():
+                s = self._ecb_series(ecb_key)
+                if s is not None and len(s) > 10:
+                    cache[country][mat] = s
+                    logger.info(f'  {country} {mat}Y (ECB): {len(s)} pts  last={s.iloc[-1]:.3f}%')
+                else:
+                    fred_key = self.FRED_INTL.get(country, {}).get(mat)
+                    if fred_key:
+                        s = self._fred_series(fred_key)
+                        if s is not None and len(s) > 5:
+                            cache[country][mat] = s
+                            logger.info(f'  {country} {mat}Y (FRED): {len(s)} pts  last={s.iloc[-1]:.3f}%')
+
+        # ── UK ───────────────────────────────────────────────────────
+        cache['UK'] = {}
+        s = self._boe_series(10)
+        if s is not None and len(s) > 10:
+            cache['UK'][10] = s
+            logger.info(f'  UK 10Y (BoE): {len(s)} pts  last={s.iloc[-1]:.3f}%')
+        else:
+            s = self._fred_series('IRLTLT01GBM156N')
+            if s is not None:
+                cache['UK'][10] = s
+                logger.info(f'  UK 10Y (FRED): {len(s)} pts  last={s.iloc[-1]:.3f}%')
+
+        # ── Japan ────────────────────────────────────────────────────
+        cache['JP'] = {}
+        s = self._fred_series('IRLTLT01JPM156N')
+        if s is not None and len(s) > 5:
+            cache['JP'][10] = s
+            logger.info(f'  JP 10Y (FRED): {len(s)} pts  last={s.iloc[-1]:.3f}%')
+
+        self._cache      = cache
+        self.last_update = datetime.now()
+        return bool(cache.get('US'))
+
+    # ------------------------------------------------------------------
+    def latest(self, country: str, maturity: int) -> Optional[float]:
+        """Dernier taux disponible pour un pays/maturité (en %)."""
+        s = self._cache.get(country, {}).get(maturity)
+        return float(s.iloc[-1]) if s is not None and len(s) > 0 else None
+
+    def history(self, country: str, maturity: int) -> Optional[pd.Series]:
+        """Série historique complète pour un pays/maturité."""
+        return self._cache.get(country, {}).get(maturity)
+
+# ==============================================================================
+# YIELD CURVE BUILDER  (Nelson-Siegel par pays)
 # ==============================================================================
 
 class YieldCurveBuilder:
     """
-    Nelson-Siegel yield curve bootstrapped from live FRED data.
-    Covers the full maturity spectrum: 1M T-Bill → 30Y T-Bond.
+    Construit une courbe Nelson-Siegel par pays à partir des points fetched.
+    Utilisé par le BondPricer pour le pricing DCF.
     """
 
-    # FRED series IDs by maturity (years)
-    FRED_SERIES: Dict[float, str] = {
-        0.083: 'DTB4WK',   # 1-Month T-Bill
-        0.25:  'DTB3',     # 3-Month T-Bill
-        0.5:   'DTB6',     # 6-Month T-Bill
-        1.0:   'DGS1',
-        2.0:   'DGS2',
-        3.0:   'DGS3',
-        5.0:   'DGS5',
-        7.0:   'DGS7',
-        10.0:  'DGS10',
-        20.0:  'DGS20',
-        30.0:  'DGS30',
-    }
+    def __init__(self, fetcher: SovereignYieldFetcher):
+        self.fetcher   = fetcher
+        self._params: Dict[str, Tuple] = {}   # {country: (b0,b1,b2,tau)}
 
-    def __init__(self):
-        self.yields: Dict[float, float] = {}
-        self.ns_params: Tuple = (4.5, -0.5, 1.0, 2.0)   # beta0, beta1, beta2, tau
-        self.last_update: Optional[datetime] = None
-
-    # ------------------------------------------------------------------
-    def fetch_yields(self) -> bool:
-        """Fetch live yields from FRED and fit Nelson-Siegel."""
-        yields = {}
-        for maturity, series_id in self.FRED_SERIES.items():
-            try:
-                url = (
-                    f'https://fred.stlouisfed.org/graph/fredgraph.csv'
-                    f'?id={series_id}&cosd=2024-01-01'
-                )
-                r = requests.get(url, timeout=6)
-                if r.status_code == 200:
-                    for line in reversed(r.text.strip().split('\n')[1:]):
-                        parts = line.split(',')
-                        if len(parts) == 2 and parts[1] not in ('.', ''):
-                            yields[maturity] = float(parts[1])
-                            break
-            except Exception as e:
-                logger.warning(f'[FRED] {series_id}: {e}')
-
-        if len(yields) >= 4:
-            self.yields = yields
-            self.last_update = datetime.now()
-            self._fit_nelson_siegel()
-            logger.info(f'[YIELD CURVE] {len(yields)} points loaded, NS fitted')
-            return True
-
-        # Fallback
-        logger.warning('[YIELD CURVE] Insufficient FRED data — using fallback')
-        self.yields = {
-            0.25: 5.25, 0.5: 5.15, 1.0: 4.90, 2.0: 4.50,
-            5.0: 4.20, 10.0: 4.35, 30.0: 4.55
-        }
-        self._fit_nelson_siegel()
-        return False
-
-    # ------------------------------------------------------------------
     @staticmethod
-    def _ns_formula(t: float, b0: float, b1: float, b2: float, tau: float) -> float:
-        """Nelson-Siegel model: yield = f(maturity)."""
+    def _ns(t: float, b0: float, b1: float, b2: float, tau: float) -> float:
         if t <= 0:
             return b0 + b1
         decay = (1 - np.exp(-t / tau)) / (t / tau)
         hump  = decay - np.exp(-t / tau)
         return b0 + b1 * decay + b2 * hump
 
-    def _fit_nelson_siegel(self):
-        """Least-squares fit of NS parameters to observed yields."""
-        mats = np.array(list(self.yields.keys()))
-        obs  = np.array(list(self.yields.values()))
+    def fit(self, country: str):
+        """Fitter NS sur les points disponibles pour ce pays."""
+        points = {
+            mat: self.fetcher.latest(country, mat)
+            for mat in (1, 2, 5, 10, 30)
+            if self.fetcher.latest(country, mat) is not None
+        }
+        if len(points) < 2:
+            self._params[country] = (4.0, -0.5, 1.0, 2.0)
+            return
 
-        def objective(params):
-            b0, b1, b2, tau = params
+        mats = np.array(list(points.keys()), dtype=float)
+        obs  = np.array(list(points.values()), dtype=float)
+
+        def objective(p):
+            b0, b1, b2, tau = p
             if tau <= 0 or b0 <= 0:
                 return 1e10
-            fitted = np.array([self._ns_formula(t, b0, b1, b2, tau) for t in mats])
+            fitted = np.array([self._ns(t, b0, b1, b2, tau) for t in mats])
             return np.sum((fitted - obs) ** 2)
 
-        x0     = [obs[-1], obs[0] - obs[-1], 0.5, 2.0]
-        bounds = [(0.1, 15), (-10, 10), (-10, 10), (0.1, 30)]
-        result = minimize(objective, x0, bounds=bounds, method='L-BFGS-B')
-        self.ns_params = tuple(result.x) if result.success else (4.5, -0.5, 1.0, 2.0)
+        x0     = [obs.mean(), obs[0] - obs[-1], 0.5, 2.0]
+        bounds = [(0.01, 20), (-15, 15), (-15, 15), (0.1, 30)]
+        res    = minimize(objective, x0, bounds=bounds, method='L-BFGS-B')
+        self._params[country] = tuple(res.x) if res.success else (obs.mean(), -0.3, 0.5, 2.0)
 
-    # ------------------------------------------------------------------
-    def get_rate(self, maturity_years: float) -> float:
-        """Return annualised yield (%) for a given maturity via NS model."""
-        return self._ns_formula(maturity_years, *self.ns_params)
+    def fit_all(self):
+        for c in ('US', 'DE', 'FR', 'IT', 'UK', 'JP'):
+            self.fit(c)
 
-    def get_discount_factor(self, t: float) -> float:
-        """Continuous-compounding discount factor e^(-r*t)."""
-        return np.exp(-(self.get_rate(t) / 100) * t)
+    def get_rate(self, country: str, maturity_years: float) -> float:
+        """Taux (%) pour un pays et une maturité via NS."""
+        if country not in self._params:
+            self.fit(country)
+        return self._ns(maturity_years, *self._params[country])
 
 
+# ==============================================================================
+# BOND PRICER  (DCF + Duration + Convexity)
 # ==============================================================================
 
 class BondPricer:
     """
-    Full DCF bond pricer.
-    Works for T-Bills (zero-coupon, discount basis) and coupon bonds.
-    Computes: price, modified duration, convexity, DV01.
+    Pricing DCF complet d'une obligation souveraine.
+
+    Rôle dans la stratégie :
+    • Calcule le prix THÉORIQUE d'un futures (prix fair value)
+    • Compare au prix MARCHÉ → alpha NPV
+    • Fournit Duration / Convexity / DV01 pour le sizing et le hedging
+    • Si alpha NPV va dans le même sens que le spread signal → confidence boostée
     """
 
     def __init__(self, curve: YieldCurveBuilder):
         self.curve = curve
 
-    # ------------------------------------------------------------------
     def price_bond(
         self,
-        coupon_rate: float,        # annual rate, decimal (e.g. 0.045)
-        par: float,                # face value
+        country: str,
+        coupon_rate: float,          # annuel, décimal (ex: 0.043)
+        par: float,                  # valeur nominale (ex: 100)
         years_to_maturity: float,
-        credit_spread: float = 0.0,  # decimal (e.g. 0.015 = 150 bps)
-        freq: int = 2              # payments per year (2 = semi-annual)
+        freq: int = 2,               # semi-annuel par défaut
     ) -> Dict:
         """
-        Price a bond via full DCF.
-        Discount rate at each coupon date = spot risk-free rate + credit_spread.
-        Returns price, modified duration, convexity, DV01.
+        DCF complet : chaque flux est actualisé au taux spot NS correspondant.
+        Retourne prix, duration modifiée, convexité, DV01.
         """
-        coupon_pmt = (par * coupon_rate) / freq
+        coupon_pmt = par * coupon_rate / freq
         n          = max(1, int(round(years_to_maturity * freq)))
-
         pv = dur_num = conv_num = 0.0
 
         for i in range(1, n + 1):
-            t  = i / freq
-            rf = self.curve.get_rate(t) / 100
-            dr = rf + credit_spread
-            df = 1 / (1 + dr / freq) ** i
-            cf = coupon_pmt + (par if i == n else 0)
-
+            t   = i / freq
+            rf  = self.curve.get_rate(country, t) / 100
+            df  = 1 / (1 + rf / freq) ** i
+            cf  = coupon_pmt + (par if i == n else 0)
             pv_cf     = cf * df
             pv        += pv_cf
             dur_num   += t * pv_cf
             conv_num  += t * (t + 1 / freq) * pv_cf
 
         if pv == 0:
-            return {'price': par, 'macaulay_duration': 0,
-                    'modified_duration': 0, 'convexity': 0, 'dv01': 0}
+            return {'price': par, 'modified_duration': 0, 'convexity': 0, 'dv01': 0}
 
-        mid_rf  = self.curve.get_rate(years_to_maturity / 2) / 100
-        ytm_est = mid_rf + credit_spread
+        mid_rf  = self.curve.get_rate(country, years_to_maturity / 2) / 100
         mac_dur = dur_num / pv
-        mod_dur = mac_dur / (1 + ytm_est / freq)
-        convex  = conv_num / (pv * (1 + ytm_est / freq) ** 2)
+        mod_dur = mac_dur / (1 + mid_rf / freq)
+        convex  = conv_num / (pv * (1 + mid_rf / freq) ** 2)
 
         return {
-            'price':              pv,
-            'macaulay_duration':  mac_dur,
-            'modified_duration':  mod_dur,
-            'convexity':          convex,
-            'dv01':               mod_dur * pv * 0.0001,   # $ per 1bp
+            'price':             pv,
+            'macaulay_duration': mac_dur,
+            'modified_duration': mod_dur,
+            'convexity':         convex,
+            'dv01':              mod_dur * pv * 0.0001,
         }
 
-    # ------------------------------------------------------------------
-    def ytm_to_price(
+    def npv_alpha(
         self,
-        ytm: float,
-        coupon_rate: float,
-        par: float,
-        years: float,
-        freq: int = 2
-    ) -> float:
-        """Convert a YTM (decimal) to a clean/dirty price."""
-        coupon    = par * coupon_rate / freq
-        n         = max(1, int(round(years * freq)))
-        period_r  = ytm / freq
-        if period_r == 0:
-            return coupon * n + par
-        pv_coupons = coupon * (1 - (1 + period_r) ** -n) / period_r
-        pv_par     = par / (1 + period_r) ** n
-        return pv_coupons + pv_par
-
-    # ------------------------------------------------------------------
-    def price_tbill(self, face: float, days: int, discount_rate: float) -> float:
-        """T-Bill price on discount basis (bank discount convention)."""
-        return face * (1 - discount_rate * days / 360)
-
-# ==============================================================================
-# STEP 2 — CREDIT RISK ADJUSTMENT  [Enhanced Modigliani-Miller]
-# ==============================================================================
-
-class EnhancedModiglianiMiller:
-    """
-    Enhanced APV framework for corporate bond credit risk.
-
-    Improvements over the original MM_Options_Bot:
-    ─────────────────────────────────────────────────
-    • Merton model uses an iterative solver (not a single-pass estimate)
-      to back out asset value V and asset volatility σ_V from equity data.
-    • Altman Z-Score blended with Merton PD for robustness.
-    • LGD calibrated by sector recovery rate, asset coverage and leverage.
-    • Credit spread = PD_blended × LGD / (1 − PD_blended).
-    • Tax shield discounted at cost-of-debt (Miles-Ezzell correction).
-    • Distress costs scale with PD and asset value (Andrade-Kaplan 1998).
-    • Agency costs from Jensen free-cash-flow overinvestment proxy.
-    """
-
-    # Base LGD (= 1 − recovery rate) by GICS sector
-    SECTOR_LGD: Dict[str, float] = {
-        'Technology':              0.55,
-        'Healthcare':              0.50,
-        'Financial Services':      0.45,
-        'Energy':                  0.60,
-        'Utilities':               0.35,
-        'Consumer Cyclical':       0.60,
-        'Consumer Defensive':      0.45,
-        'Industrials':             0.55,
-        'Materials':               0.60,
-        'Real Estate':             0.50,
-        'Communication Services':  0.55,
-        'default':                 0.55,
-    }
-
-    def __init__(self, ticker: str, curve: YieldCurveBuilder):
-        self.ticker = ticker
-        self.curve  = curve
-        self.rf     = curve.get_rate(1.0) / 100   # 1Y risk-free as base
-        self.stock  = yf.Ticker(ticker)
-        self.data: Dict = {}
-
-    # ------------------------------------------------------------------
-    def fetch_data(self) -> bool:
-        """Pull financials from yfinance and compute derived ratios."""
-        try:
-            info = self.stock.info
-            bs   = self.stock.balance_sheet
-            inc  = self.stock.income_stmt
-            cf   = self.stock.cashflow
-            hist = self.stock.history(period='1y')
-
-            def _safe(df, key, default=0.0):
-                try:
-                    val = df.loc[key].iloc[0]
-                    return float(val) if pd.notna(val) else default
-                except Exception:
-                    return default
-
-            mkt_cap   = float(info.get('marketCap', 0) or 0)
-            price     = float(info.get('currentPrice', 0) or 0)
-            shares    = float(info.get('sharesOutstanding', 0) or 0)
-            total_dbt = _safe(bs, 'Total Debt')
-            cash      = _safe(bs, 'Cash And Cash Equivalents')
-            eq_book   = _safe(bs, 'Stockholders Equity')
-            tot_assets= _safe(bs, 'Total Assets') or mkt_cap + total_dbt
-            cur_assets= _safe(bs, 'Current Assets')
-            cur_liab  = _safe(bs, 'Current Liabilities')
-            ret_earn  = _safe(bs, 'Retained Earnings')
-            ebit      = _safe(inc, 'EBIT')
-            ebitda    = _safe(inc, 'EBITDA') or ebit * 1.15
-            net_inc   = _safe(inc, 'Net Income')
-            revenue   = _safe(inc, 'Total Revenue')
-            int_exp   = abs(_safe(inc, 'Interest Expense')) or total_dbt * 0.05
-            fcf_val   = _safe(cf, 'Free Cash Flow')
-
-            # Annualised equity volatility from 1Y daily returns
-            sigma_eq = 0.30
-            if len(hist) > 20:
-                rets     = hist['Close'].pct_change().dropna()
-                sigma_eq = float(rets.std() * np.sqrt(252))
-
-            self.data = {
-                # Market
-                'market_cap':       mkt_cap,
-                'stock_price':      price,
-                'shares':           shares,
-                'enterprise_value': mkt_cap + total_dbt - cash,
-                # Balance sheet
-                'total_debt':       total_dbt,
-                'cash':             cash,
-                'net_debt':         total_dbt - cash,
-                'eq_book':          eq_book,
-                'total_assets':     tot_assets,
-                'cur_assets':       cur_assets,
-                'cur_liab':         cur_liab,
-                'working_capital':  cur_assets - cur_liab,
-                'retained_earnings':ret_earn,
-                # P&L
-                'ebit':             ebit,
-                'ebitda':           ebitda,
-                'net_income':       net_inc,
-                'revenue':          revenue,
-                'interest_expense': int_exp,
-                'fcf':              fcf_val,
-                'tax_rate':         float(info.get('effectiveTaxRate', 0.25) or 0.25),
-                'beta':             float(info.get('beta', 1.0) or 1.0),
-                # Derived
-                'debt_to_equity':   total_dbt / eq_book if eq_book > 0 else 0,
-                'interest_coverage':ebit / int_exp      if int_exp  > 0 else 999,
-                'sigma_equity':     sigma_eq,
-                'sector':           info.get('sector', 'default') or 'default',
-            }
-            return True
-
-        except Exception as e:
-            logger.debug(f'[MM] {self.ticker} fetch failed: {e}')
-            return False
-
-    # ------------------------------------------------------------------
-    # Altman Z-Score  (Altman 1968, public-company version)
-    # ------------------------------------------------------------------
-    def altman_zscore(self) -> Dict:
-        """
-        Z = 1.2·X1 + 1.4·X2 + 3.3·X3 + 0.6·X4 + 1.0·X5
-
-        Z > 2.99  → Safe    (PD proxy ~1–5%)
-        1.81–2.99 → Grey    (PD proxy ~5–15%)
-        Z < 1.81  → Distress (PD proxy 15–40%)
-        """
-        d  = self.data
-        TA = d['total_assets']
-        if TA <= 0:
-            return {'z_score': 0.0, 'zone': 'Unknown', 'pd_proxy': 0.50}
-
-        X1 = d['working_capital']  / TA
-        X2 = d['retained_earnings']/ TA
-        X3 = d['ebit']             / TA
-        X4 = d['market_cap'] / d['total_debt'] if d['total_debt'] > 0 else 10.0
-        X5 = d['revenue']          / TA
-
-        z = 1.2*X1 + 1.4*X2 + 3.3*X3 + 0.6*X4 + 1.0*X5
-
-        if z > 2.99:
-            zone     = 'Safe'
-            pd_proxy = max(0.005, 0.01 - (z - 2.99) * 0.005)
-        elif z > 1.81:
-            zone     = 'Grey'
-            pd_proxy = 0.05 + (2.99 - z) / (2.99 - 1.81) * 0.10
-        else:
-            zone     = 'Distress'
-            pd_proxy = min(0.40, 0.15 + (1.81 - z) * 0.05)
-
-        return {'z_score': z, 'zone': zone, 'pd_proxy': float(pd_proxy)}
-
-    # ------------------------------------------------------------------
-    # Merton Structural Model — Iterative Solver
-    # ------------------------------------------------------------------
-    def merton_pd(self, horizon_years: float = 1.0) -> Dict:
-        """
-        Iterative Merton model to back out asset value V and σ_V
-        from observed equity market cap E and equity volatility σ_E.
-
-        Key equations:
-          E = V·N(d1) − D·e^(−rf·T)·N(d2)      [Black-Scholes call]
-          σ_E·E = N(d1)·σ_V·V                    [Ito's lemma]
-
-        Returns PD = N(−d2) and distance-to-default d2.
-        """
-        E       = self.data['market_cap']
-        D       = self.data['total_debt']
-        sigma_E = self.data['sigma_equity']
-        rf      = self.rf
-        T       = horizon_years
-
-        if E <= 0 or D <= 0 or sigma_E <= 0:
-            return {'pd': 0.01, 'dd': 3.0, 'asset_value': E + D, 'asset_vol': sigma_E}
-
-        # Seed estimates
-        V       = E + D
-        sigma_V = sigma_E * E / V
-
-        for _ in range(200):
-            if sigma_V <= 0:
-                break
-            d1 = (np.log(V / D) + (rf + 0.5 * sigma_V**2) * T) / (sigma_V * np.sqrt(T))
-            d2 = d1 - sigma_V * np.sqrt(T)
-
-            Nd1 = norm.cdf(d1)
-            Nd2 = norm.cdf(d2)
-
-            # New asset value from equity equation
-            V_new = (E + D * np.exp(-rf * T) * Nd2) / Nd1 if Nd1 > 1e-8 else E + D
-            # New asset vol from Ito relation
-            sigma_V_new = sigma_E * E / (Nd1 * V_new) if (Nd1 * V_new) > 0 else sigma_E
-
-            # Damped update for stability
-            V       = 0.7 * V_new       + 0.3 * V
-            sigma_V = 0.7 * sigma_V_new + 0.3 * sigma_V
-            sigma_V = max(0.01, min(sigma_V, 2.0))
-
-            if abs(V_new - V) / (V + 1e-8) < 1e-7:
-                break
-
-        d2_final = (np.log(V / D) + (rf - 0.5 * sigma_V**2) * T) / (sigma_V * np.sqrt(T))
-        pd       = float(norm.cdf(-d2_final))
-
-        return {
-            'pd':          min(pd, 0.99),
-            'dd':          d2_final,        # Distance-to-default
-            'asset_value': V,
-            'asset_vol':   sigma_V,
-        }
-
-    # ------------------------------------------------------------------
-    # LGD Estimation
-    # ------------------------------------------------------------------
-    def estimate_lgd(self) -> float:
-        """
-        Base LGD from sector, adjusted for:
-        • Asset coverage  (high coverage → lower LGD)
-        • Financial leverage (high D/E → higher LGD)
-        """
-        sector   = self.data.get('sector', 'default')
-        base_lgd = self.SECTOR_LGD.get(sector, self.SECTOR_LGD['default'])
-
-        # Asset coverage adjustment  (coverage ratio = TA / D)
-        TA       = self.data['total_assets']
-        D        = self.data['total_debt']
-        coverage = TA / D if D > 0 else 5.0
-        cov_adj  = max(-0.15, min(0.15, (1.0 - coverage) * 0.10))
-
-        # Leverage adjustment
-        de         = self.data['debt_to_equity']
-        lev_adj    = min(0.10, max(0.0, (de - 2.0) * 0.02))
-
-        return float(min(0.90, max(0.10, base_lgd + cov_adj + lev_adj)))
-
-    # ------------------------------------------------------------------
-    # Credit Spread
-    # ------------------------------------------------------------------
-    def credit_spread(self, horizon_years: float = 5.0) -> Dict:
-        """
-        Actuarial credit spread: s = PD_blended × LGD / (1 − PD_blended)
-
-        PD_blended = 70% Merton + 30% Altman proxy  (diversification of models)
-        """
-        merton  = self.merton_pd(horizon_years)
-        z       = self.altman_zscore()
-        lgd     = self.estimate_lgd()
-
-        pd_blended = 0.70 * merton['pd'] + 0.30 * z['pd_proxy']
-        spread     = pd_blended * lgd / max(1.0 - pd_blended, 0.01)
-
-        # Implied rating bucket
-        if   spread < 0.0050: rating = 'AAA/AA'
-        elif spread < 0.0100: rating = 'A'
-        elif spread < 0.0175: rating = 'BBB'
-        elif spread < 0.0300: rating = 'BB'
-        elif spread < 0.0500: rating = 'B'
-        else:                 rating = 'CCC/D'
-
-        return {
-            'spread':               spread,
-            'spread_bps':           spread * 10_000,
-            'blended_pd':           pd_blended,
-            'lgd':                  lgd,
-            'merton_pd':            merton['pd'],
-            'distance_to_default':  merton['dd'],
-            'asset_value':          merton['asset_value'],
-            'asset_vol':            merton['asset_vol'],
-            'z_score':              z['z_score'],
-            'z_zone':               z['zone'],
-            'implied_rating':       rating,
-        }
-
-    # ------------------------------------------------------------------
-    # APV — Adjusted Present Value  (full M-M decomposition)
-    # ------------------------------------------------------------------
-    def calculate_apv(self) -> Dict:
-        """
-        APV = VU + PV(tax shield) − PV(distress costs) − PV(agency costs)
-
-        • Tax shield   : τ × interest_expense / k_d  (Miles-Ezzell: discounted at k_d)
-        • Distress cost: PD × 20% × V_assets  (Andrade-Kaplan 1998)
-        • Agency cost  : Jensen FCF proxy + overleverage penalty
-        """
-        d  = self.data
-        cr = self.credit_spread()
-
-        # ── Tax Shield ──────────────────────────────────────────────
-        k_d         = self.rf + cr['spread']
-        ts_annual   = d['tax_rate'] * d['interest_expense']
-        pv_ts       = ts_annual / k_d if k_d > 0 else 0.0
-
-        # ── Unlevered Value (strip tax shield from EV) ───────────────
-        VU = d['enterprise_value'] - pv_ts
-
-        # ── Financial Distress Costs ─────────────────────────────────
-        pv_distress = cr['blended_pd'] * 0.20 * cr['asset_value']
-
-        # ── Agency Costs (Jensen 1986) ───────────────────────────────
-        agency_score = 0.0
-        if d['debt_to_equity'] > 2.0:
-            agency_score += (d['debt_to_equity'] - 2.0) * 0.03
-        fcf_yield = abs(d['fcf']) / d['market_cap'] if d['market_cap'] > 0 else 0
-        if fcf_yield > 0.10:
-            agency_score += (fcf_yield - 0.10) * 0.30
-        pv_agency = agency_score * d['market_cap']
-
-        # ── Levered Value ────────────────────────────────────────────
-        VL = VU + pv_ts - pv_distress - pv_agency
-
-        target_price   = VL / d['shares'] if d['shares'] > 0 else 0.0
-        divergence_pct = (VL - d['enterprise_value']) / d['enterprise_value'] * 100 \
-                         if d['enterprise_value'] > 0 else 0.0
-
-        return {
-            'VU':              VU,
-            'pv_tax_shield':   pv_ts,
-            'pv_distress':     pv_distress,
-            'pv_agency':       pv_agency,
-            'VL_theoretical':  VL,
-            'target_price':    target_price,
-            'divergence_pct':  divergence_pct,
-            'cost_of_debt':    k_d,
-            **cr,
-        }
-
-# ==============================================================================
-# STEP 3 — EQUITY CROSS-CHECK
-# ==============================================================================
-
-class EquityCrossCheck:
-    """
-    Detect pricing inconsistencies between the bond market and the equity market.
-
-    M-M Insight
-    ───────────
-    Under M-M, both markets are pricing the same underlying firm.
-    If they disagree on the firm's implied PD (or value), there is an arbitrage:
-
-        Bond market  → implied PD via credit spread inversion
-        Equity market → implied PD via Merton model on stock price/vol
-
-    If  PD_bond >> PD_equity  → bond is *cheap*  (BUY_BOND)
-    If  PD_bond << PD_equity  → bond is *expensive* (SELL_BOND / consider equity put)
-
-    Alpha = bond_price_market − bond_price_fair
-      where fair price uses equity-implied credit spread (from APV)
-    """
-
-    def __init__(self, pricer: BondPricer, mm: EnhancedModiglianiMiller):
-        self.pricer = pricer
-        self.mm     = mm
-
-    # ------------------------------------------------------------------
-    def cross_check(
-        self,
-        bond_market_ytm: float,      # observed YTM, decimal
-        bond_coupon: float,          # bond coupon rate, decimal
-        bond_par: float,             # face value
-        bond_years: float,           # time to maturity in years
-    ) -> Dict:
-        """
-        Full cross-check pipeline.
-
-        Returns a dict with the alpha signal, basis-point gap,
-        PD divergence, and all intermediate metrics.
-        """
-        d   = self.mm.data
-        apv = self.mm.calculate_apv()
-
-        # ── Risk-free component at this maturity ─────────────────────
-        rf_rate     = self.mm.curve.get_rate(bond_years) / 100
-        mkt_spread  = max(0.0, bond_market_ytm - rf_rate)
-
-        # ── Bond price at market YTM ──────────────────────────────────
-        bond_price_mkt  = self.pricer.ytm_to_price(
-            bond_market_ytm, bond_coupon, bond_par, bond_years
-        )
-
-        # ── PD implied by the bond market (spread inversion) ─────────
-        lgd             = self.mm.estimate_lgd()
-        pd_from_bond    = mkt_spread / (lgd + mkt_spread) \
-                          if (lgd + mkt_spread) > 0 else 0.0
-
-        # ── PD implied by equity market (Merton) ─────────────────────
-        merton          = self.mm.merton_pd(bond_years)
-        pd_from_equity  = merton['pd']
-
-        # ── PD Gap ───────────────────────────────────────────────────
-        pd_gap = pd_from_bond - pd_from_equity   # >0 → bond mkt more fearful
-
-        # ── Fair bond price using equity-implied spread ───────────────
-        eq_spread       = apv['spread']
-        fair_dict       = self.pricer.price_bond(
-            coupon_rate=bond_coupon,
-            par=bond_par,
-            years_to_maturity=bond_years,
-            credit_spread=eq_spread,
-        )
-        bond_price_fair = fair_dict['price']
-
-        # ── Alpha ─────────────────────────────────────────────────────
-        alpha_price     = bond_price_mkt - bond_price_fair
-        alpha_bps       = (bond_market_ytm - (rf_rate + eq_spread)) * 10_000
-
-        # ── Signal ────────────────────────────────────────────────────
-        #   alpha_bps < 0 → market YTM > fair YTM → bond cheap → BUY
-        #   alpha_bps > 0 → market YTM < fair YTM → bond rich  → SELL
-        if   alpha_bps < -MIN_ALPHA_BPS:  signal = 'BUY_BOND'
-        elif alpha_bps >  MIN_ALPHA_BPS:  signal = 'SELL_BOND'
-        else:                              signal = 'HOLD'
-
-        # ── Confidence (0–100) ────────────────────────────────────────
-        pd_score    = min(abs(pd_gap) / 0.10 * 50.0, 50.0)
-        price_score = min(abs(alpha_bps) / 100.0 * 50.0, 50.0)
-        confidence  = pd_score + price_score
-
-        return {
-            'signal':                   signal,
-            'alpha_bps':                alpha_bps,
-            'alpha_price':              alpha_price,
-            'bond_price_market':        bond_price_mkt,
-            'bond_price_fair':          bond_price_fair,
-            'modified_duration':        fair_dict['modified_duration'],
-            'convexity':                fair_dict['convexity'],
-            'dv01':                     fair_dict['dv01'],
-            'pd_from_bond':             pd_from_bond,
-            'pd_from_equity':           pd_from_equity,
-            'pd_gap':                   pd_gap,
-            'market_spread_bps':        mkt_spread  * 10_000,
-            'equity_spread_bps':        eq_spread   * 10_000,
-            'ev_from_equity':           d['market_cap'] + d['net_debt'],
-            'confidence':               confidence,
-            'apv':                      apv,
-        }
-
-# ==============================================================================
-# STEP 4 — MISPRICING DETECTOR
-# ==============================================================================
-
-class MispricingDetector:
-    """
-    Aggregates signals from Steps 1–3 into a single Alpha per instrument.
-
-      Alpha = Price_market − Price_fair
-
-    Handles two asset classes:
-    ─────────────────────────
-    • Treasuries (T-Bills / T-Notes / T-Bonds)
-        Pure rate arbitrage: DCF at NS curve, zero credit spread.
-        Instruments traded via CME/CBOT futures (ZT, ZF, ZN, ZB).
-
-    • Corporate bonds
-        Credit-adjusted DCF + equity cross-check via Enhanced M-M.
-    """
-
-    def __init__(self, curve: YieldCurveBuilder, pricer: BondPricer):
-        self.curve  = curve
-        self.pricer = pricer
-
-    # ------------------------------------------------------------------
-    def analyze_treasury(
-        self,
+        country: str,
         coupon_rate: float,
         par: float,
         years_to_maturity: float,
         market_price: float,
-        label: str = '',
     ) -> Dict:
         """
-        Step 1 + Step 4 for a Treasury instrument.
-        Fair price = full DCF at NS spot curve, no credit spread.
+        Alpha NPV = (Prix_marché − Prix_fair) / Prix_fair  en %
+        Positif → bond cher (candidat SELL)
+        Négatif → bond pas cher (candidat BUY)
         """
-        fair      = self.pricer.price_bond(coupon_rate, par, years_to_maturity, 0.0)
-        alpha     = market_price - fair['price']
-        alpha_bps = alpha / fair['price'] * 10_000
-
-        if   alpha_bps < -2: signal = 'BUY'
-        elif alpha_bps >  2: signal = 'SELL'
-        else:                 signal = 'HOLD'
+        fair    = self.price_bond(country, coupon_rate, par, years_to_maturity)
+        alpha   = market_price - fair['price']
+        alpha_pct = alpha / fair['price'] * 100
 
         return {
-            'type':               'TREASURY',
-            'label':              label,
-            'market_price':       market_price,
-            'fair_price':         fair['price'],
-            'alpha':              alpha,
-            'alpha_bps':          alpha_bps,
-            'signal':             signal,
-            'confidence':         min(abs(alpha_bps) * 5.0, 100.0),
-            'modified_duration':  fair['modified_duration'],
-            'convexity':          fair['convexity'],
-            'dv01':               fair['dv01'],
+            'fair_price':  fair['price'],
+            'alpha':       alpha,
+            'alpha_pct':   alpha_pct,
+            'alpha_bps':   alpha / fair['price'] * 10_000,
+            **fair,
+        }
+
+# ==============================================================================
+# SPREAD ANALYZER  (Signal 1 — Inter-pays)
+# ==============================================================================
+
+class SpreadAnalyzer:
+    """
+    Calcule les spreads entre pays et détecte les déviations via z-score.
+
+    Logique :
+    ─────────
+    1. spread(t) = yield_A(t) − yield_B(t)
+    2. z(t) = (spread(t) − mean(spread, window)) / std(spread, window)
+    3. |z| > ZSCORE_ENTRY  → signal de mean-reversion
+       |z| < ZSCORE_EXIT   → sortie de position
+
+    Interprétation du signal :
+    • z >> 0  : spread A−B trop large vs historique
+                → A trop cher / B trop bon marché
+                → SHORT futures A  +  LONG futures B
+
+    • z << 0  : spread A−B trop étroit vs historique
+                → A trop bon marché / B trop cher
+                → LONG futures A  +  SHORT futures B
+    """
+
+    def __init__(
+        self,
+        fetcher: SovereignYieldFetcher,
+        window: int  = ZSCORE_WINDOW,
+        z_entry: float = ZSCORE_ENTRY,
+        z_exit:  float = ZSCORE_EXIT,
+    ):
+        self.fetcher  = fetcher
+        self.window   = window
+        self.z_entry  = z_entry
+        self.z_exit   = z_exit
+
+    # ------------------------------------------------------------------
+    def compute_spread_series(
+        self, country_a: str, country_b: str, maturity: int
+    ) -> Optional[pd.Series]:
+        """Série historique du spread A−B pour une maturité donnée."""
+        sa = self.fetcher.history(country_a, maturity)
+        sb = self.fetcher.history(country_b, maturity)
+        if sa is None or sb is None:
+            return None
+
+        # Aligner sur l'index commun (inner join)
+        df = pd.DataFrame({'a': sa, 'b': sb}).dropna()
+        if len(df) < 20:
+            return None
+
+        return df['a'] - df['b']
+
+    # ------------------------------------------------------------------
+    def zscore(self, series: pd.Series) -> float:
+        """Z-score du dernier point vs fenêtre glissante."""
+        s = series.dropna()
+        if len(s) < 10:
+            return 0.0
+        window = min(self.window, len(s))
+        mu     = s.iloc[-window:].mean()
+        sigma  = s.iloc[-window:].std()
+        if sigma < 1e-8:
+            return 0.0
+        return float((s.iloc[-1] - mu) / sigma)
+
+    # ------------------------------------------------------------------
+    def analyze_pair(
+        self, country_a: str, country_b: str, maturity: int
+    ) -> Dict:
+        """
+        Analyse complète d'une paire de spread.
+        Retourne le signal, le z-score, le spread actuel et la confidence.
+        """
+        spread_series = self.compute_spread_series(country_a, country_b, maturity)
+
+        label = f'{country_a}{maturity}Y-{country_b}{maturity}Y'
+
+        if spread_series is None or len(spread_series) < 10:
+            return {
+                'pair':           label,
+                'signal':         'NO_DATA',
+                'z_score':        0.0,
+                'spread_current': None,
+                'spread_mean':    None,
+                'spread_std':     None,
+                'confidence':     0.0,
+                'leg_long':       None,
+                'leg_short':      None,
+            }
+
+        z       = self.zscore(spread_series)
+        window  = min(self.window, len(spread_series))
+        mu      = float(spread_series.iloc[-window:].mean())
+        sigma   = float(spread_series.iloc[-window:].std())
+        current = float(spread_series.iloc[-1])
+
+        # ── Signal ────────────────────────────────────────────────────
+        if z > self.z_entry:
+            # Spread trop large → A cher, B bon marché → SHORT A / LONG B
+            signal    = 'SPREAD_SHORT_A'
+            leg_long  = country_b
+            leg_short = country_a
+        elif z < -self.z_entry:
+            # Spread trop étroit → A bon marché, B cher → LONG A / SHORT B
+            signal    = 'SPREAD_LONG_A'
+            leg_long  = country_a
+            leg_short = country_b
+        else:
+            signal    = 'HOLD'
+            leg_long  = None
+            leg_short = None
+
+        # ── Confidence : 0 à 100 ──────────────────────────────────────
+        # 50% du score vient de l'amplitude du z-score (capped à z=4)
+        # 50% vient du nombre de points historiques (confiance statistique)
+        z_score_pts  = min(abs(z) / 4.0 * 50.0, 50.0)
+        history_pts  = min(len(spread_series) / self.window * 50.0, 50.0)
+        confidence   = z_score_pts + history_pts
+
+        return {
+            'pair':           label,
+            'country_a':      country_a,
+            'country_b':      country_b,
+            'maturity':       maturity,
+            'signal':         signal,
+            'z_score':        z,
+            'spread_current': current,
+            'spread_mean':    mu,
+            'spread_std':     sigma,
+            'deviation_bps':  (current - mu) * 100,   # en bps
+            'confidence':     confidence,
+            'leg_long':       leg_long,
+            'leg_short':      leg_short,
+            'n_points':       len(spread_series),
         }
 
     # ------------------------------------------------------------------
-    def analyze_corporate_bond(
+    def analyze_all(self) -> List[Dict]:
+        """Analyser toutes les paires configurées dans SPREAD_PAIRS."""
+        results = []
+        for country_a, country_b, maturity in SPREAD_PAIRS:
+            res = self.analyze_pair(country_a, country_b, maturity)
+            results.append(res)
+            if res['signal'] != 'HOLD' and res['signal'] != 'NO_DATA':
+                logger.info(
+                    f'[SPREAD] {res["pair"]:16s} | '
+                    f'z={res["z_score"]:+5.2f} | '
+                    f'spread={res["spread_current"]:+6.2f}% '
+                    f'(moy={res["spread_mean"]:+5.2f}% ±{res["spread_std"]:.2f}%) | '
+                    f'dev={res["deviation_bps"]:+5.1f}bps | '
+                    f'{res["signal"]:20s} conf={res["confidence"]:.0f}%'
+                )
+        return results
+
+# ==============================================================================
+# SIGNAL AGGREGATOR  (Combine Spread + NPV)
+# ==============================================================================
+
+class SignalAggregator:
+    """
+    Combine le signal spread inter-pays (Signal 1) avec la confirmation NPV (Signal 2).
+
+    Règle de combinaison :
+    ──────────────────────
+    • Signal spread seul, sans confirmation NPV → confidence × 0.80
+    • Signal spread + NPV dans le même sens     → confidence × 1.20 (boost)
+    • Signal spread + NPV opposé               → confidence × 0.60 (réduction)
+
+    Exemple :
+      Spread dit SHORT ZN (US cher vs Bund)
+      NPV dit   ZN est 0.08% au-dessus du fair value
+      → NPV CONFIRME le short ZN → boost confidence
+    """
+
+    def __init__(self, pricer: BondPricer):
+        self.pricer = pricer
+
+    # Paramètres de chaque futures pour le pricing NPV
+    # (country, coupon_approx, par, années_maturité_nominale)
+    FUTURES_PARAMS: Dict[str, Tuple] = {
+        'ZT':   ('US', 0.045,  100,  2.0),
+        'ZF':   ('US', 0.042,  100,  5.0),
+        'ZN':   ('US', 0.043,  100, 10.0),
+        'ZB':   ('US', 0.045,  100, 30.0),
+        'FGBS': ('DE', 0.010,  100,  2.0),
+        'FGBM': ('DE', 0.010,  100,  5.0),
+        'FGBL': ('DE', 0.020,  100, 10.0),
+        'FGBX': ('DE', 0.025,  100, 30.0),
+        'R':    ('UK', 0.035,  100, 10.0),
+    }
+
+    # Mapping pays+maturité → futures symbol (legs)
+    COUNTRY_TO_FUTURES: Dict[Tuple, str] = {
+        ('US',  2):  'ZT',
+        ('US',  5):  'ZF',
+        ('US', 10):  'ZN',
+        ('US', 30):  'ZB',
+        ('DE',  2):  'FGBS',
+        ('DE',  5):  'FGBM',
+        ('DE', 10):  'FGBL',
+        ('DE', 30):  'FGBX',
+        ('UK', 10):  'R',
+    }
+
+    # Exchanges par futures
+    FUTURES_EXCHANGE: Dict[str, str] = {
+        'ZT': 'CBOT', 'ZF': 'CBOT', 'ZN': 'CBOT', 'ZB': 'CBOT',
+        'FGBS': 'EUREX', 'FGBM': 'EUREX', 'FGBL': 'EUREX', 'FGBX': 'EUREX',
+        'R': 'LIFFE',
+    }
+
+    def npv_confirmation(
         self,
-        ticker: str,
-        bond_coupon: float,
-        bond_par: float,
-        bond_years: float,
-        bond_market_ytm: float,
+        futures_symbol: str,
+        market_price: Optional[float],
+        spread_signal: str,
+        leg_role: str,   # 'long' ou 'short'
+    ) -> Dict:
+        """
+        Calcule l'alpha NPV et détermine si il confirme ou contredit le spread signal.
+
+        spread_signal : 'SPREAD_SHORT_A' ou 'SPREAD_LONG_A'
+        leg_role      : rôle de ce futures dans le trade ('long' ou 'short')
+        """
+        if futures_symbol not in self.FUTURES_PARAMS or market_price is None:
+            return {'confirmed': False, 'alpha_pct': 0.0, 'multiplier': 1.0}
+
+        country, coupon, par, years = self.FUTURES_PARAMS[futures_symbol]
+        npv = self.pricer.npv_alpha(country, coupon, par, years, market_price)
+        alpha_pct = npv['alpha_pct']
+
+        # Logique de confirmation :
+        # Si on est LONG ce futures → on veut qu'il soit bon marché (alpha_pct < 0)
+        # Si on est SHORT ce futures → on veut qu'il soit cher (alpha_pct > 0)
+        confirmed = (
+            (leg_role == 'long'  and alpha_pct < -NPV_THRESHOLD) or
+            (leg_role == 'short' and alpha_pct >  NPV_THRESHOLD)
+        )
+        opposed   = (
+            (leg_role == 'long'  and alpha_pct >  NPV_THRESHOLD) or
+            (leg_role == 'short' and alpha_pct < -NPV_THRESHOLD)
+        )
+
+        if confirmed:
+            multiplier = 1.20
+        elif opposed:
+            multiplier = 0.60
+        else:
+            multiplier = 0.80
+
+        return {
+            'confirmed':  confirmed,
+            'alpha_pct':  alpha_pct,
+            'alpha_bps':  npv['alpha_bps'],
+            'fair_price': npv['fair_price'],
+            'mod_dur':    npv['modified_duration'],
+            'convexity':  npv['convexity'],
+            'dv01':       npv['dv01'],
+            'multiplier': multiplier,
+        }
+
+    def build_trade(
+        self,
+        spread_result: Dict,
+        prices: Dict[str, float],   # {futures_symbol: market_price}
     ) -> Optional[Dict]:
         """
-        Steps 2 + 3 + 4 for a corporate bond.
-        Returns None if financial data cannot be fetched.
+        Construit le trade complet à partir du signal spread + confirmation NPV.
+        Retourne None si données insuffisantes.
         """
-        mm = EnhancedModiglianiMiller(ticker, self.curve)
-        if not mm.fetch_data():
+        if spread_result['signal'] in ('HOLD', 'NO_DATA'):
             return None
 
-        checker = EquityCrossCheck(self.pricer, mm)
-        cross   = checker.cross_check(
-            bond_market_ytm=bond_market_ytm,
-            bond_coupon=bond_coupon,
-            bond_par=bond_par,
-            bond_years=bond_years,
-        )
+        country_a = spread_result['country_a']
+        country_b = spread_result['country_b']
+        maturity  = spread_result['maturity']
+        signal    = spread_result['signal']
 
-        logger.info(
-            f'[{ticker:6s}] '
-            f'Alpha: {cross["alpha_bps"]:+6.1f} bps | '
-            f'PD bond: {cross["pd_from_bond"]*100:4.1f}% '
-            f'vs equity: {cross["pd_from_equity"]*100:4.1f}% | '
-            f'Rating: {cross["apv"]["implied_rating"]:7s} | '
-            f'Z: {cross["apv"]["z_score"]:4.2f} ({cross["apv"]["z_zone"]}) | '
-            f'Signal: {cross["signal"]} ({cross["confidence"]:.0f}%)'
-        )
+        # Identifier les legs
+        if signal == 'SPREAD_SHORT_A':
+            leg_long_country  = country_b
+            leg_short_country = country_a
+        else:
+            leg_long_country  = country_a
+            leg_short_country = country_b
 
-        return {'type': 'CORPORATE', 'ticker': ticker, **cross}
+        fut_long  = self.COUNTRY_TO_FUTURES.get((leg_long_country,  maturity))
+        fut_short = self.COUNTRY_TO_FUTURES.get((leg_short_country, maturity))
 
+        if not fut_long or not fut_short:
+            return None
+
+        price_long  = prices.get(fut_long)
+        price_short = prices.get(fut_short)
+
+        # Confirmation NPV sur les deux legs
+        npv_long  = self.npv_confirmation(fut_long,  price_long,  signal, 'long')
+        npv_short = self.npv_confirmation(fut_short, price_short, signal, 'short')
+
+        # Confidence finale : spread confidence × moyenne des multiplicateurs NPV
+        npv_mult     = (npv_long['multiplier'] + npv_short['multiplier']) / 2
+        final_conf   = min(spread_result['confidence'] * npv_mult, 100.0)
+
+        return {
+            'pair':          spread_result['pair'],
+            'signal':        signal,
+            'z_score':       spread_result['z_score'],
+            'spread_current':spread_result['spread_current'],
+            'spread_mean':   spread_result['spread_mean'],
+            'deviation_bps': spread_result['deviation_bps'],
+            'confidence':    final_conf,
+            'leg_long':  {
+                'futures':    fut_long,
+                'exchange':   self.FUTURES_EXCHANGE.get(fut_long, 'SMART'),
+                'price':      price_long,
+                'npv':        npv_long,
+            },
+            'leg_short': {
+                'futures':    fut_short,
+                'exchange':   self.FUTURES_EXCHANGE.get(fut_short, 'SMART'),
+                'price':      price_short,
+                'npv':        npv_short,
+            },
+        }
 
 # ==============================================================================
 # POSITION SIZER
 # ==============================================================================
 
 class DynamicPositionSizer:
-    """
-    Linear interpolation between min and max position sizes
-    based on confidence score [MIN_CONFIDENCE, 100].
-    """
+    """Sizing linéaire entre min et max selon la confidence (0-100)."""
 
     def __init__(
         self,
@@ -821,11 +784,10 @@ class DynamicPositionSizer:
         if confidence < self.min_conf or equity <= 0 or price <= 0:
             return {'can_trade': False, 'reason': f'conf={confidence:.0f}%', 'quantity': 0}
 
-        norm  = (confidence - self.min_conf) / (100.0 - self.min_conf)
-        norm  = max(0.0, min(1.0, norm))
+        norm  = max(0.0, min(1.0, (confidence - self.min_conf) / (100.0 - self.min_conf)))
         pct   = self.min_pct + (self.max_pct - self.min_pct) * norm
         value = equity * pct / 100.0
-        qty   = max(1, int(value / (price * 1_000)))   # 1 futures contract ≈ $1k face
+        qty   = max(1, int(value / (price * 1_000)))
 
         return {
             'can_trade': True,
@@ -839,57 +801,38 @@ class DynamicPositionSizer:
 # MAIN BOT — IB Integration
 # ==============================================================================
 
-class BondsArbitrageBot:
+class GovernmentBondsBot:
     """
-    Orchestration bot:
-    • Scans Treasury futures (ZT / ZF / ZN / ZB) for rate arbitrage
-    • Scans corporate bond watchlist for credit arbitrage
-    • Connects to Interactive Brokers via ib_insync
+    Bot principal — orchestre toute la stratégie et exécute sur IBKR.
+
+    Cycle complet à chaque scan :
+    1. Refresh des taux souverains (toutes les 10 scans)
+    2. Analyse spread inter-pays sur toutes les paires → Signal 1
+    3. Fetch prix futures depuis IBKR → Signal 2 (NPV confirmation)
+    4. Agrégation des deux signaux → confidence finale
+    5. Position sizing + exécution
     """
-
-    # ── Treasury futures ─────────────────────────────────────────────
-    TREASURY_SYMBOLS: List[Tuple[str, int, float]] = [
-        # (IB symbol, nominal maturity years, approx coupon)
-        ('ZT',  2,  0.045),
-        ('ZF',  5,  0.042),
-        ('ZN', 10,  0.043),
-        ('ZB', 30,  0.045),
-    ]
-
-    # ── Corporate bond watchlist ──────────────────────────────────────
-    # (equity ticker, coupon, par, years_to_maturity, market_ytm or None)
-    # When market_ytm is None, it defaults to rf + 150 bps placeholder.
-    # In production, replace with live bond data from IB or Bloomberg.
-    CORPORATE_WATCHLIST: List[Tuple] = [
-        # Investment Grade
-        ('AAPL', 0.0395, 100, 5.0,  None),
-        ('MSFT', 0.0350, 100, 5.0,  None),
-        ('JPM',  0.0450, 100, 7.0,  None),
-        ('BAC',  0.0480, 100, 5.0,  None),
-        ('XOM',  0.0420, 100, 10.0, None),
-        # High Yield
-        ('F',    0.0625, 100, 5.0,  None),
-        ('T',    0.0520, 100, 7.0,  None),
-        ('CCL',  0.0700, 100, 5.0,  None),
-    ]
 
     def __init__(self, ib_host: str = IB_HOST, ib_port: int = IB_PORT):
-        self.ib      = IB()
-        self.host    = ib_host
-        self.port    = ib_port
+        self.ib   = IB()
+        self.host = ib_host
+        self.port = ib_port
 
-        self.curve    = YieldCurveBuilder()
-        self.pricer   = BondPricer(self.curve)
-        self.detector = MispricingDetector(self.curve, self.pricer)
-        self.sizer    = DynamicPositionSizer()
+        # Pipeline
+        self.fetcher    = SovereignYieldFetcher(history_days=400)
+        self.curve      = YieldCurveBuilder(self.fetcher)
+        self.pricer     = BondPricer(self.curve)
+        self.spread_ana = SpreadAnalyzer(self.fetcher)
+        self.aggregator = SignalAggregator(self.pricer)
+        self.sizer      = DynamicPositionSizer()
 
-        self.equity   = 0.0
-        self.running  = False
+        self.equity  = 0.0
+        self.running = False
 
     # ------------------------------------------------------------------
     async def connect(self) -> bool:
         try:
-            await self.ib.connectAsync(self.host, self.port, clientId=2)
+            await self.ib.connectAsync(self.host, self.port, clientId=3)
             logger.info(f'[CONNECTED] {self.host}:{self.port}')
             await self._refresh_equity()
             return True
@@ -907,163 +850,180 @@ class BondsArbitrageBot:
         except Exception:
             pass
         self.equity = 1_000_000.0
-        logger.warning('[EQUITY] Fallback $1M')
 
     # ------------------------------------------------------------------
-    async def _front_month_contract(self, symbol: str):
-        """Return (contract, expiry_datetime) for front-month futures."""
+    async def _front_month(self, symbol: str, exchange: str) -> Optional[Tuple]:
+        """Retourne (contract, expiry_date) pour le front-month."""
         try:
-            raw = Future(symbol=symbol, exchange='CBOT', currency='USD')
+            raw     = Future(symbol=symbol, exchange=exchange, currency='USD')
             details = await self.ib.reqContractDetailsAsync(raw)
             if not details:
                 return None
             details.sort(key=lambda d: d.contract.lastTradeDateOrContractMonth)
             front  = details[0].contract
             expiry = datetime.strptime(front.lastTradeDateOrContractMonth[:8], '%Y%m%d')
-            # Roll if < 7 days to expiry
             if (expiry - datetime.now()).days < 7 and len(details) > 1:
                 front  = details[1].contract
                 expiry = datetime.strptime(front.lastTradeDateOrContractMonth[:8], '%Y%m%d')
             return front, expiry
         except Exception as e:
-            logger.error(f'[CONTRACT] {symbol}: {e}')
+            logger.debug(f'[CONTRACT] {symbol}: {e}')
             return None
 
     async def _live_price(self, contract) -> Optional[float]:
-        """Fetch live or delayed market price from IB."""
-        self.ib.reqMktData(contract, '', False, False)
-        await asyncio.sleep(2)
-        t = self.ib.ticker(contract)
-
-        candidates = [t.last, t.close]
-        if t.bid and t.ask and t.bid > 0:
-            candidates.append((t.bid + t.ask) / 2)
-
-        for v in candidates:
-            if v and not np.isnan(v) and v > 0:
-                self.ib.cancelMktData(contract)
-                return float(v)
-
-        self.ib.cancelMktData(contract)
+        """Prix live ou delayed depuis IB."""
+        try:
+            self.ib.reqMktData(contract, '', False, False)
+            await asyncio.sleep(2)
+            t = self.ib.ticker(contract)
+            for v in [t.last, t.close,
+                      (t.bid + t.ask) / 2 if t.bid and t.ask and t.bid > 0 else None]:
+                if v and not np.isnan(v) and v > 0:
+                    self.ib.cancelMktData(contract)
+                    return float(v)
+            self.ib.cancelMktData(contract)
+        except Exception:
+            pass
         return None
 
-    async def _place_order(self, contract, signal: str, sizing: Dict, price: float):
-        """Place a limit order (or log in DRY_RUN mode)."""
-        action = 'BUY' if 'BUY' in signal else 'SELL'
-        limit  = price * (1.001 if action == 'BUY' else 0.999)
+    async def _fetch_all_prices(self) -> Dict[str, Optional[float]]:
+        """Fetch les prix de tous les futures du mapping."""
+        prices: Dict[str, Optional[float]] = {}
+        for (country, mat), symbol in self.aggregator.COUNTRY_TO_FUTURES.items():
+            if symbol in prices:
+                continue
+            exchange = self.aggregator.FUTURES_EXCHANGE.get(symbol, 'SMART')
+            result   = await self._front_month(symbol, exchange)
+            if result:
+                contract, _ = result
+                price = await self._live_price(contract)
+                prices[symbol] = price
+                if price:
+                    logger.info(f'  {symbol:6s} ({exchange}): {price:.3f}')
+            else:
+                prices[symbol] = None
+            await asyncio.sleep(0.3)
+        return prices
+
+    async def _execute_leg(
+        self,
+        leg: Dict,
+        action: str,
+        sizing: Dict,
+    ):
+        """Exécuter un leg (BUY ou SELL) via IBKR."""
+        symbol   = leg['futures']
+        exchange = leg['exchange']
+        price    = leg['price']
+        qty      = sizing['quantity']
+
+        if price is None:
+            logger.warning(f'[SKIP] {symbol} — pas de prix marché')
+            return
+
+        result = await self._front_month(symbol, exchange)
+        if not result:
+            logger.warning(f'[SKIP] {symbol} — contrat non trouvé')
+            return
+        contract, _ = result
+        limit = price * (1.001 if action == 'BUY' else 0.999)
 
         if DRY_RUN:
             logger.info(
-                f'[DRY RUN] {action} {sizing["quantity"]}x '
-                f'{getattr(contract, "localSymbol", str(contract))} '
-                f'@ {limit:.4f}  (${sizing["value"]:,.0f})'
+                f'[DRY RUN] {action:4s} {qty}x {symbol} @ {limit:.3f}  '
+                f'(NPV alpha: {leg["npv"]["alpha_pct"]:+.3f}%  '
+                f'dur={leg["npv"].get("mod_dur", 0):.2f}  '
+                f'dv01=${leg["npv"].get("dv01", 0):.2f})'
             )
             return
 
-        order = LimitOrder(action, sizing['quantity'], limit)
+        order = LimitOrder(action, qty, limit)
         self.ib.placeOrder(contract, order)
-        logger.info(
-            f'[ORDER] {action} {sizing["quantity"]}x '
-            f'{getattr(contract, "localSymbol", "")} @ {limit:.4f}'
-        )
-
-    # ------------------------------------------------------------------
-    async def scan_treasuries(self):
-        """Scan T-Bill/Treasury futures — Steps 1 + 4."""
-        logger.info('\n--- TREASURIES ---')
-        for symbol, nom_yrs, est_coupon in self.TREASURY_SYMBOLS:
-            result = await self._front_month_contract(symbol)
-            if not result:
-                continue
-            contract, expiry = result
-            years = max(0.1, (expiry - datetime.now()).days / 365.25)
-            price = await self._live_price(contract)
-            if not price:
-                logger.warning(f'[NO PRICE] {symbol}')
-                continue
-
-            ana = self.detector.analyze_treasury(
-                coupon_rate=est_coupon,
-                par=100.0,
-                years_to_maturity=years,
-                market_price=price,
-                label=getattr(contract, 'localSymbol', symbol),
-            )
-
-            logger.info(
-                f'[{ana["label"]:8s}] '
-                f'Mkt: {price:7.3f} | Fair: {ana["fair_price"]:7.3f} | '
-                f'Alpha: {ana["alpha_bps"]:+6.1f} bps | '
-                f'Dur: {ana["modified_duration"]:4.2f} | '
-                f'DV01: ${ana["dv01"]:5.2f} | '
-                f'Signal: {ana["signal"]} ({ana["confidence"]:.0f}%)'
-            )
-
-            if ana['signal'] != 'HOLD':
-                sizing = self.sizer.calculate(self.equity, ana['confidence'], price)
-                if sizing['can_trade']:
-                    await self._place_order(contract, ana['signal'], sizing, price)
-
-            await asyncio.sleep(0.5)
-
-    # ------------------------------------------------------------------
-    async def scan_corporates(self):
-        """Scan corporate bond watchlist — Steps 2 + 3 + 4."""
-        logger.info('\n--- CORPORATE BONDS ---')
-        for ticker, coupon, par, years, ytm in self.CORPORATE_WATCHLIST:
-            if ytm is None:
-                ytm = self.curve.get_rate(years) / 100 + 0.015  # rf + 150 bps placeholder
-
-            result = self.detector.analyze_corporate_bond(ticker, coupon, par, years, ytm)
-            if result and result['signal'] != 'HOLD' and result['confidence'] >= MIN_CONFIDENCE:
-                # Corporate bond execution requires CUSIP/ISIN lookup in production
-                logger.info(
-                    f'[SIGNAL] {ticker} | {result["signal"]} | '
-                    f'Alpha: {result["alpha_bps"]:+.1f} bps | '
-                    f'Confidence: {result["confidence"]:.0f}%'
-                )
-            await asyncio.sleep(1)
+        logger.info(f'[ORDER] {action} {qty}x {symbol} @ {limit:.3f}')
 
     # ------------------------------------------------------------------
     async def run(self):
-        """Main scan loop — runs until stopped or disconnected."""
+        """Boucle principale."""
         self.running = True
         scan = 0
 
         logger.info('\n' + '='*80)
-        logger.info('[START] Bond Arbitrage Strategy — T-Bills & Corporate Bonds')
-        logger.info(f'  Scan interval : {SCAN_INTERVAL}s')
-        logger.info(f'  Min alpha     : {MIN_ALPHA_BPS} bps')
-        logger.info(f'  Min confidence: {MIN_CONFIDENCE}%')
-        logger.info(f'  Dry run       : {DRY_RUN}')
+        logger.info('[START] Government Bond Arbitrage — Spread Inter-pays + NPV')
+        logger.info(f'  Z-score entry  : ±{ZSCORE_ENTRY}')
+        logger.info(f'  Z-score exit   : ±{ZSCORE_EXIT}')
+        logger.info(f'  NPV threshold  : {NPV_THRESHOLD}%')
+        logger.info(f'  Scan interval  : {SCAN_INTERVAL}s')
+        logger.info(f'  Min confidence : {MIN_CONFIDENCE}%')
+        logger.info(f'  Dry run        : {DRY_RUN}')
         logger.info('='*80)
 
-        # Initial yield curve
-        self.curve.fetch_yields()
+        # Chargement initial
+        self.fetcher.fetch_all()
+        self.curve.fit_all()
 
         try:
             while self.running:
                 scan += 1
-                logger.info(f'\n[SCAN #{scan}] {datetime.now():%Y-%m-%d %H:%M:%S}')
+                logger.info(f'\n{"="*80}')
+                logger.info(f'[SCAN #{scan}] {datetime.now():%Y-%m-%d %H:%M:%S}')
+                logger.info('='*80)
 
                 await self._refresh_equity()
 
-                # Refresh yield curve every 10 scans (~10 min)
-                if scan % 10 == 1:
-                    self.curve.fetch_yields()
+                # Refresh yields toutes les 10 scans
+                if scan % 10 == 1 and scan > 1:
+                    logger.info('[REFRESH] Mise à jour des taux souverains…')
+                    self.fetcher.fetch_all()
+                    self.curve.fit_all()
 
-                await self.scan_treasuries()
-                await self.scan_corporates()
+                # ── Signal 1 : Spread analysis ─────────────────────
+                logger.info('\n[STEP 1] Spread Inter-pays')
+                spread_results = self.spread_ana.analyze_all()
 
-                logger.info(f'\n[SLEEP] Next scan in {SCAN_INTERVAL}s…')
+                # ── Signal 2 : Prix futures pour NPV ───────────────
+                logger.info('\n[STEP 2] Fetch prix futures (NPV confirmation)')
+                prices = await self._fetch_all_prices()
+
+                # ── Agrégation & Exécution ──────────────────────────
+                logger.info('\n[STEP 3] Agrégation + Exécution')
+                for sr in spread_results:
+                    trade = self.aggregator.build_trade(sr, prices)
+                    if trade is None:
+                        continue
+
+                    logger.info(
+                        f'\n  TRADE │ {trade["pair"]:18s} │ {trade["signal"]:20s}\n'
+                        f'        │ z={trade["z_score"]:+5.2f} │ dev={trade["deviation_bps"]:+5.1f}bps │ conf={trade["confidence"]:.0f}%\n'
+                        f'        │ LONG  {trade["leg_long"]["futures"]:6s} @ {trade["leg_long"]["price"] or "N/A"!s}  '
+                        f'NPV alpha={trade["leg_long"]["npv"]["alpha_pct"]:+.3f}%\n'
+                        f'        │ SHORT {trade["leg_short"]["futures"]:6s} @ {trade["leg_short"]["price"] or "N/A"!s}  '
+                        f'NPV alpha={trade["leg_short"]["npv"]["alpha_pct"]:+.3f}%'
+                    )
+
+                    if trade['confidence'] < MIN_CONFIDENCE:
+                        logger.info(f'        │ [SKIP] Confidence trop basse ({trade["confidence"]:.0f}%)')
+                        continue
+
+                    # Sizing basé sur le leg long (référence)
+                    ref_price = trade['leg_long']['price'] or 100.0
+                    sizing    = self.sizer.calculate(self.equity, trade['confidence'], ref_price)
+
+                    if not sizing['can_trade']:
+                        logger.info(f'        │ [SKIP] {sizing["reason"]}')
+                        continue
+
+                    # Exécuter les deux legs
+                    await self._execute_leg(trade['leg_long'],  'BUY',  sizing)
+                    await self._execute_leg(trade['leg_short'], 'SELL', sizing)
+
+                logger.info(f'\n[SLEEP] Prochain scan dans {SCAN_INTERVAL}s…')
                 await asyncio.sleep(SCAN_INTERVAL)
 
         except asyncio.CancelledError:
             logger.info('[STOPPED]')
         except Exception as e:
             logger.error(f'[CRASH] {e}')
-            import traceback
-            traceback.print_exc()
+            import traceback; traceback.print_exc()
         finally:
             self.running = False
             self.ib.disconnect()
@@ -1075,21 +1035,20 @@ class BondsArbitrageBot:
 # ==============================================================================
 
 async def main():
-    bot = BondsArbitrageBot(ib_host=IB_HOST, ib_port=IB_PORT)
+    bot = GovernmentBondsBot(ib_host=IB_HOST, ib_port=IB_PORT)
 
     if not await bot.connect():
-        logger.error('[FAILED] Cannot connect to TWS')
-        logger.info('Troubleshooting:')
-        logger.info('  1. Is TWS open?')
-        logger.info('  2. API enabled? → File → Global Config → API → Enable')
-        logger.info('  3. Port: 7497 = Paper Trading | 7496 = Live Trading')
+        logger.error('[FAILED] Connexion IBKR impossible')
+        logger.info('  1. TWS ouvert ?')
+        logger.info('  2. API activée ? → File → Global Config → API')
+        logger.info('  3. Port : 7497 = Paper | 7496 = Live')
         return
 
     try:
         await bot.run()
     except KeyboardInterrupt:
         bot.running = False
-        logger.info('[SHUTDOWN] Ctrl+C received')
+        logger.info('[SHUTDOWN] Ctrl+C')
 
 
 if __name__ == '__main__':
