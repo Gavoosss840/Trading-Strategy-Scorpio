@@ -1,0 +1,217 @@
+"""
+Analytics — Yield Curve, Bond Pricer, Spread Analyzer
+"""
+
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
+from typing import Dict, List, Optional, Tuple
+
+from .config import ZSCORE_WINDOW, ZSCORE_ENTRY, ZSCORE_EXIT, SPREAD_PAIRS
+from .data import SovereignYieldFetcher
+
+
+class YieldCurveBuilder:
+    """Nelson-Siegel yield curve fitted per country."""
+
+    def __init__(self, fetcher: SovereignYieldFetcher):
+        self.fetcher = fetcher
+        self._params: Dict[str, Tuple] = {}
+
+    @staticmethod
+    def _ns(t, b0, b1, b2, tau):
+        if t <= 0:
+            return b0 + b1
+        d = (1 - np.exp(-t / tau)) / (t / tau)
+        return b0 + b1 * d + b2 * (d - np.exp(-t / tau))
+
+    def fit(self, country: str, until: Optional[pd.Timestamp] = None):
+        points = {}
+        for mat in (1, 2, 5, 10, 30):
+            if until is not None:
+                s = self.fetcher.history_until(country, mat, until)
+                v = float(s.iloc[-1]) if s is not None and len(s) > 0 else None
+            else:
+                v = self.fetcher.latest(country, mat)
+            if v is not None:
+                points[mat] = v
+
+        if len(points) < 2:
+            self._params[country] = (4.0, -0.5, 1.0, 2.0)
+            return
+
+        mats = np.array(list(points.keys()), dtype=float)
+        obs  = np.array(list(points.values()), dtype=float)
+
+        def obj(p):
+            b0, b1, b2, tau = p
+            if tau <= 0 or b0 <= 0:
+                return 1e10
+            return np.sum((np.array([self._ns(t, b0, b1, b2, tau) for t in mats]) - obs) ** 2)
+
+        res = minimize(obj, [obs.mean(), obs[0] - obs[-1], 0.5, 2.0],
+                       bounds=[(0.01, 20), (-15, 15), (-15, 15), (0.1, 30)],
+                       method='L-BFGS-B')
+        self._params[country] = tuple(res.x) if res.success else (obs.mean(), -0.3, 0.5, 2.0)
+
+    def fit_all(self, until: Optional[pd.Timestamp] = None):
+        for c in ('US', 'DE', 'FR', 'IT', 'UK', 'JP'):
+            self.fit(c, until)
+
+    def get_rate(self, country: str, maturity_years: float) -> float:
+        """Yield (%) via Nelson-Siegel for a given country and maturity."""
+        if country not in self._params:
+            self.fit(country)
+        return self._ns(maturity_years, *self._params[country])
+
+
+class BondPricer:
+    """Full DCF bond pricer — price, modified duration, convexity, DV01."""
+
+    def __init__(self, curve: YieldCurveBuilder):
+        self.curve = curve
+
+    def price_bond(self, country: str, coupon_rate: float, par: float,
+                   years: float, freq: int = 2) -> Dict:
+        pmt = par * coupon_rate / freq
+        n   = max(1, int(round(years * freq)))
+        pv = dur = conv = 0.0
+
+        for i in range(1, n + 1):
+            t  = i / freq
+            rf = self.curve.get_rate(country, t) / 100
+            df = 1 / (1 + rf / freq) ** i
+            cf = pmt + (par if i == n else 0)
+            pv_cf = cf * df
+            pv   += pv_cf
+            dur  += t * pv_cf
+            conv += t * (t + 1 / freq) * pv_cf
+
+        if pv == 0:
+            return {'price': par, 'macaulay_duration': 0,
+                    'modified_duration': 0, 'convexity': 0, 'dv01': 0}
+
+        mid_rf  = self.curve.get_rate(country, years / 2) / 100
+        mac_dur = dur / pv
+        mod_dur = mac_dur / (1 + mid_rf / freq)
+        convex  = conv / (pv * (1 + mid_rf / freq) ** 2)
+        return {
+            'price':             pv,
+            'macaulay_duration': mac_dur,
+            'modified_duration': mod_dur,
+            'convexity':         convex,
+            'dv01':              mod_dur * pv * 0.0001,
+        }
+
+    def npv_alpha(self, country: str, coupon_rate: float, par: float,
+                  years: float, market_price: float) -> Dict:
+        """Alpha = (market_price - fair_price) / fair_price in %."""
+        fair      = self.price_bond(country, coupon_rate, par, years)
+        alpha     = market_price - fair['price']
+        alpha_pct = alpha / fair['price'] * 100
+        return {
+            'fair_price': fair['price'],
+            'alpha':      alpha,
+            'alpha_pct':  alpha_pct,
+            'alpha_bps':  alpha / fair['price'] * 10_000,
+            **fair,
+        }
+
+
+class SpreadAnalyzer:
+    """
+    Computes inter-country yield spreads and z-scores.
+
+    Signal logic:
+      z > +ZSCORE_ENTRY  → spread A-B too wide  → SHORT A / LONG B
+      z < -ZSCORE_ENTRY  → spread A-B too tight → LONG A / SHORT B
+    """
+
+    def __init__(self, fetcher: SovereignYieldFetcher,
+                 window: int = ZSCORE_WINDOW,
+                 z_entry: float = ZSCORE_ENTRY,
+                 z_exit: float = ZSCORE_EXIT):
+        self.fetcher  = fetcher
+        self.window   = window
+        self.z_entry  = z_entry
+        self.z_exit   = z_exit
+
+    def spread_series(self, ca: str, cb: str, mat: int,
+                      until: Optional[pd.Timestamp] = None) -> Optional[pd.Series]:
+        if until is not None:
+            sa = self.fetcher.history_until(ca, mat, until)
+            sb = self.fetcher.history_until(cb, mat, until)
+        else:
+            sa = self.fetcher.history(ca, mat)
+            sb = self.fetcher.history(cb, mat)
+        if sa is None or sb is None:
+            return None
+        df = pd.DataFrame({'a': sa, 'b': sb}).dropna()
+        return (df['a'] - df['b']) if len(df) >= 20 else None
+
+    def zscore(self, series: pd.Series) -> float:
+        s = series.dropna()
+        if len(s) < 10:
+            return 0.0
+        w     = min(self.window, len(s))
+        mu    = s.iloc[-w:].mean()
+        sigma = s.iloc[-w:].std()
+        return float((s.iloc[-1] - mu) / sigma) if sigma > 1e-8 else 0.0
+
+    def analyze_pair(self, ca: str, cb: str, mat: int,
+                     until: Optional[pd.Timestamp] = None) -> Dict:
+        import logging
+        logger = logging.getLogger(__name__)
+
+        ss    = self.spread_series(ca, cb, mat, until)
+        label = f'{ca}{mat}Y-{cb}{mat}Y'
+
+        if ss is None or len(ss) < 10:
+            return {
+                'pair': label, 'country_a': ca, 'country_b': cb, 'maturity': mat,
+                'signal': 'NO_DATA', 'z_score': 0.0,
+                'spread_current': None, 'spread_mean': None, 'spread_std': None,
+                'confidence': 0.0, 'leg_long': None, 'leg_short': None, 'n_points': 0,
+            }
+
+        z       = self.zscore(ss)
+        w       = min(self.window, len(ss))
+        mu      = float(ss.iloc[-w:].mean())
+        sigma   = float(ss.iloc[-w:].std())
+        current = float(ss.iloc[-1])
+
+        if   z >  self.z_entry: signal, ll, ls = 'SPREAD_SHORT_A', cb, ca
+        elif z < -self.z_entry: signal, ll, ls = 'SPREAD_LONG_A',  ca, cb
+        else:                    signal, ll, ls = 'HOLD', None, None
+
+        z_pts = min(abs(z) / 4.0 * 50, 50.0)
+        h_pts = min(len(ss) / self.window * 50, 50.0)
+
+        result = {
+            'pair':            label,
+            'country_a':       ca,
+            'country_b':       cb,
+            'maturity':        mat,
+            'signal':          signal,
+            'z_score':         z,
+            'spread_current':  current,
+            'spread_mean':     mu,
+            'spread_std':      sigma,
+            'deviation_bps':   (current - mu) * 100,
+            'confidence':      z_pts + h_pts,
+            'leg_long':        ll,
+            'leg_short':       ls,
+            'n_points':        len(ss),
+        }
+
+        if signal not in ('HOLD', 'NO_DATA'):
+            logger.info(
+                f'[SPREAD] {label:16s}  z={z:+5.2f}  '
+                f'spread={current:+6.3f}%  (moy={mu:+5.3f}% ±{sigma:.3f}%)  '
+                f'dev={result["deviation_bps"]:+5.1f}bps  '
+                f'{signal:20s}  conf={result["confidence"]:.0f}%'
+            )
+        return result
+
+    def analyze_all(self, until: Optional[pd.Timestamp] = None) -> List[Dict]:
+        return [self.analyze_pair(ca, cb, mat, until) for ca, cb, mat in SPREAD_PAIRS]
