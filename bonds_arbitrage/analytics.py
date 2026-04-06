@@ -8,7 +8,7 @@ import pandas as pd
 from scipy.optimize import minimize
 from typing import Dict, List, Optional, Tuple
 
-from .config import ZSCORE_WINDOW, ZSCORE_ENTRY, ZSCORE_EXIT, SPREAD_PAIRS
+from .config import ZSCORE_WINDOW, ZSCORE_STD_WIN, ZSCORE_ENTRY, ZSCORE_EXIT, SPREAD_PAIRS
 from .data import SovereignYieldFetcher
 
 logger = logging.getLogger(__name__)
@@ -149,12 +149,14 @@ class SpreadAnalyzer:
 
     def __init__(self, fetcher: SovereignYieldFetcher,
                  window: int = ZSCORE_WINDOW,
+                 std_window: int = ZSCORE_STD_WIN,
                  z_entry: float = ZSCORE_ENTRY,
                  z_exit: float = ZSCORE_EXIT):
-        self.fetcher  = fetcher
-        self.window   = window
-        self.z_entry  = z_entry
-        self.z_exit   = z_exit
+        self.fetcher    = fetcher
+        self.window     = window      # mean window (long-term level)
+        self.std_window = std_window  # std window  (recent volatility)
+        self.z_entry    = z_entry
+        self.z_exit     = z_exit
 
     def spread_series(self, ca: str, cb: str, mat: int,
                       until: Optional[pd.Timestamp] = None) -> Optional[pd.Series]:
@@ -170,12 +172,21 @@ class SpreadAnalyzer:
         return (df['a'] - df['b']) if len(df) >= 20 else None
 
     def zscore(self, series: pd.Series) -> float:
+        """
+        Split-window z-score:
+          mean  = last self.window  days  → stable long-term reference level
+          sigma = last self.std_window days → recent volatility context
+
+        This captures deviations from a long-term equilibrium even when the
+        spread is in a multi-month trend (e.g. Fed-hike regime 2022).
+        """
         s = series.dropna()
         if len(s) < 10:
             return 0.0
-        w     = min(self.window, len(s))
-        mu    = s.iloc[-w:].mean()
-        sigma = s.iloc[-w:].std()
+        w_mean = min(self.window,     len(s))
+        w_std  = min(self.std_window, len(s))
+        mu    = float(s.iloc[-w_mean:].mean())
+        sigma = float(s.iloc[-w_std:].std())
         return float((s.iloc[-1] - mu) / sigma) if sigma > 1e-8 else 0.0
 
     def analyze_pair(self, ca: str, cb: str, mat: int,
@@ -208,8 +219,8 @@ class SpreadAnalyzer:
         else:
             signal, ll, ls = 'HOLD', None, None
 
-        z_pts = min(abs(z) / 4.0 * 50, 50.0)
-        h_pts = min(len(ss) / self.window * 50, 50.0)
+        z_pts = min(abs(z) / 3.0 * 50, 50.0)         # 50 pts at z=3
+        h_pts = min(len(ss) / self.window * 50, 50.0)  # 50 pts at full mean window
 
         result = {
             'pair':           label,

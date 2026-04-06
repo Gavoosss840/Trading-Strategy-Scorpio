@@ -14,10 +14,11 @@ IB_PORT = 7497          # 7497 = Paper Trading | 7496 = Live Trading
 # ==============================================================================
 # PARAMÈTRES Z-SCORE (spread inter-pays)
 # ==============================================================================
-ZSCORE_WINDOW  = 90     # fenêtre glissante (jours de trading ≈ 4.5 mois)
-ZSCORE_ENTRY   = 1.5    # entrée  quand |z| > 1.5  (~87e percentile)
+ZSCORE_WINDOW  = 252    # fenêtre pour la MOYENNE (niveau de long terme)
+ZSCORE_STD_WIN = 60     # fenêtre pour la VOLATILITÉ (contexte récent)
+ZSCORE_ENTRY   = 1.5    # entrée  quand |z| > 1.5
 ZSCORE_EXIT    = 0.3    # sortie  quand |z| < 0.3
-ZSCORE_STOP    = 3.0    # stop-loss si z franchit 3.0 (spread continue de diverger)
+ZSCORE_STOP    = 3.0    # stop-loss si |z| > 3.0
 
 # ==============================================================================
 # PARAMÈTRES NPV (confirmation secondaire)
