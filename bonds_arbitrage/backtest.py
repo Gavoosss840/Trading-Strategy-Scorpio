@@ -75,20 +75,30 @@ class Backtester:
 
             # ── 1. Signals ────────────────────────────────────────────
             signals  = self.spread.analyze_all(until=day)
-            sig_map  = {(r['country_a'], r['country_b'], r['maturity']): r
-                        for r in signals}
+            sig_map  = {
+                (r['country_a'], r['country_b'], r['maturity']): r
+                for r in signals
+                if 'country_a' in r
+            }
 
             # ── 2. Update / close open positions ─────────────────────
             still_open = []
             for pos in open_positions:
-                key = (pos['country_a'], pos['country_b'], pos['maturity'])
+                ca, cb, mat = pos['country_a'], pos['country_b'], pos['maturity']
+                key = (ca, cb, mat)
                 sr  = sig_map.get(key)
-                if sr is None or sr['spread_series_last2'] is None:
+                if sr is None or sr.get('spread_current') is None:
                     still_open.append(pos)
                     continue
 
+                # Compute daily spread delta directly from series (in bps)
+                ss = self.spread.spread_series(ca, cb, mat, until=day)
+                if ss is None or len(ss) < 2:
+                    still_open.append(pos)
+                    continue
+                d_sprd = float(ss.iloc[-1] - ss.iloc[-2]) * 100  # bps
+
                 z_now  = sr['z_score']
-                d_sprd = sr.get('spread_delta_bps', 0.0)
                 dv01   = DV01_BY_MAT.get(pos['maturity'], 850)
                 qty    = pos.get('qty', 1)
 

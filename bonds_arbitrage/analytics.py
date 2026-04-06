@@ -168,7 +168,8 @@ class SpreadAnalyzer:
 
         if ss is None or len(ss) < 10:
             return {
-                'pair': label, 'signal': 'NO_DATA', 'z_score': 0.0,
+                'pair': label, 'country_a': ca, 'country_b': cb, 'maturity': mat,
+                'signal': 'NO_DATA', 'z_score': 0.0,
                 'spread_current': None, 'spread_mean': None, 'spread_std': None,
                 'confidence': 0.0, 'leg_long': None, 'leg_short': None, 'n_points': 0,
             }
