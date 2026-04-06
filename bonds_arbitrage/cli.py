@@ -50,10 +50,10 @@ HELP_TEXT = """
 ║    --from DATE    Date de début  (défaut : 2019-01-01)                      ║
 ║    --to   DATE    Date de fin    (défaut : aujourd'hui)                     ║
 ║    --capital N    Capital initial  (défaut : 1 000 000 $)                  ║
-║    --html         Exporter le rapport en HTML  (backtest_report.html)       ║
+║    --html         Exporter le rapport en HTML  (output/backtest_report.html)║
 ║                                                                              ║
 ║  report         Rapport de performance (positions + métriques)              ║
-║    --html         Exporter en HTML  (report.html)                           ║
+║    --html         Exporter en HTML  (output/report.html)                    ║
 ║                                                                              ║
 ║  positions      Afficher les positions ouvertes                             ║
 ║                                                                              ║

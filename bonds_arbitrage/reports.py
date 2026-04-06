@@ -1,8 +1,10 @@
 """
 Reports — Terminal (ASCII) and HTML report generation
+All HTML files are saved in the output/ folder.
 """
 
 import logging
+import os
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -12,6 +14,11 @@ from .portfolio import PortfolioTracker
 logger = logging.getLogger(__name__)
 
 LINE = '─' * 80
+OUTPUT_DIR = 'output'
+
+
+def _ensure_output_dir():
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 class ReportGenerator:
@@ -95,6 +102,9 @@ class ReportGenerator:
                   spread_results: List[Dict],
                   backtest: Optional[Dict] = None,
                   filepath: str = 'report.html') -> str:
+        _ensure_output_dir()
+        # Always save inside output/
+        filepath = os.path.join(OUTPUT_DIR, os.path.basename(filepath))
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         spread_rows = ''
