@@ -8,7 +8,8 @@ import pandas as pd
 from scipy.optimize import minimize
 from typing import Dict, List, Optional, Tuple
 
-from .config import ZSCORE_WINDOW, ZSCORE_STD_WIN, ZSCORE_ENTRY, ZSCORE_EXIT, SPREAD_PAIRS
+from .config import (ZSCORE_WINDOW, ZSCORE_STD_WIN, ZSCORE_ENTRY, ZSCORE_EXIT,
+                     ZSCORE_WINDOW_MONTHLY, ZSCORE_STD_WIN_MONTHLY, SPREAD_PAIRS)
 from .data import SovereignYieldFetcher
 
 logger = logging.getLogger(__name__)
@@ -152,11 +153,13 @@ class SpreadAnalyzer:
                  std_window: int = ZSCORE_STD_WIN,
                  z_entry: float = ZSCORE_ENTRY,
                  z_exit: float = ZSCORE_EXIT):
-        self.fetcher    = fetcher
-        self.window     = window      # mean window (long-term level)
-        self.std_window = std_window  # std window  (recent volatility)
-        self.z_entry    = z_entry
-        self.z_exit     = z_exit
+        self.fetcher        = fetcher
+        self.window         = window      # mean window for daily data (trading days)
+        self.std_window     = std_window  # std window for daily data
+        self.window_m       = ZSCORE_WINDOW_MONTHLY    # mean window for monthly data
+        self.std_window_m   = ZSCORE_STD_WIN_MONTHLY   # std window for monthly data
+        self.z_entry        = z_entry
+        self.z_exit         = z_exit
 
     def spread_series(self, ca: str, cb: str, mat: int,
                       until: Optional[pd.Timestamp] = None) -> Optional[pd.Series]:
@@ -173,18 +176,37 @@ class SpreadAnalyzer:
 
     def zscore(self, series: pd.Series) -> float:
         """
-        Split-window z-score:
-          mean  = last self.window  days  → stable long-term reference level
-          sigma = last self.std_window days → recent volatility context
+        Split-window z-score avec détection automatique de fréquence.
 
-        This captures deviations from a long-term equilibrium even when the
-        spread is in a multi-month trend (e.g. Fed-hike regime 2022).
+        Données journalières (ECB daily, ex: US-DE):
+          mean  = last self.window  jours (252 = 1 an)
+          sigma = last self.std_window jours (60 = 3 mois)
+
+        Données mensuelles (FRED, ex: US-UK/JP/FR/IT):
+          mean  = last 48 mois (4 ans) — évite les 20+ ans qui noient le signal
+          sigma = last 12 mois (1 an) — volatilité récente
+
+        → pour BTP-Bund à 250bps en 2022 vs moy 4 ans ~150bps, std 1 an ~50bps
+          z = (250-150)/50 = 2.0  →  signal fort, vs z~1.1 avec 21 ans de moyenne
         """
         s = series.dropna()
         if len(s) < 10:
             return 0.0
-        w_mean = min(self.window,     len(s))
-        w_std  = min(self.std_window, len(s))
+
+        # Détecter la fréquence : mensuel si écart médian >= 20 jours
+        if len(s) >= 3:
+            gaps = s.index.to_series().diff().dt.days.dropna()
+            is_monthly = gaps.median() >= 20
+        else:
+            is_monthly = False
+
+        if is_monthly:
+            w_mean = min(self.window_m,     len(s))
+            w_std  = min(self.std_window_m, len(s))
+        else:
+            w_mean = min(self.window,     len(s))
+            w_std  = min(self.std_window, len(s))
+
         mu    = float(s.iloc[-w_mean:].mean())
         sigma = float(s.iloc[-w_std:].std())
         return float((s.iloc[-1] - mu) / sigma) if sigma > 1e-8 else 0.0

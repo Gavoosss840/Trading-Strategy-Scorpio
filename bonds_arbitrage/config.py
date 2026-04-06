@@ -14,9 +14,12 @@ IB_PORT = 7497          # 7497 = Paper Trading | 7496 = Live Trading
 # ==============================================================================
 # PARAMÈTRES Z-SCORE (spread inter-pays)
 # ==============================================================================
-ZSCORE_WINDOW  = 504    # fenêtre pour la MOYENNE (2 ans — stable, ne chasse pas les tendances)
-ZSCORE_STD_WIN = 60     # fenêtre pour la VOLATILITÉ (contexte récent)
-ZSCORE_ENTRY   = 1.2    # entrée  quand |z| > 1.2  (↓ de 1.5 → ~4× plus de signaux)
+ZSCORE_WINDOW  = 252    # fenêtre JOURNALIÈRE (1 an) — pour paires ECB daily (US-DE)
+ZSCORE_STD_WIN = 60     # fenêtre std JOURNALIÈRE — contexte récent
+# Pour données mensuelles (UK/JP/FR/IT), la détection auto utilise 48 mois / 12 mois
+ZSCORE_WINDOW_MONTHLY  = 48   # 48 mois = 4 ans de moyenne (mensuel)
+ZSCORE_STD_WIN_MONTHLY = 12   # 12 mois = 1 an de volatilité (mensuel)
+ZSCORE_ENTRY   = 1.2    # entrée  quand |z| > 1.2
 ZSCORE_EXIT    = 0.3    # sortie  quand |z| < 0.3
 ZSCORE_STOP    = 3.0    # stop-loss si |z| > 3.0
 
