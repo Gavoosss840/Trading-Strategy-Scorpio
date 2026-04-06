@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class PortfolioTracker:
     """
-    Tracks open positions and closed trade history.
+    Tracks open spread positions (two legs) and closed trade history.
     Persists to JSON so state survives bot restarts.
     """
 
@@ -89,8 +89,10 @@ class PortfolioTracker:
         pos = self.positions.pop(pid)
         ll  = pos['leg_long']
         ls  = pos['leg_short']
-        pnl_long  = (exit_price_long  - ll['entry_price']) * ll['qty'] * 1_000
-        pnl_short = (ls['entry_price'] - exit_price_short) * ls['qty'] * 1_000
+        # P&L in contract dollar terms (price in % of par, face ≈ $100k)
+        face = 100_000
+        pnl_long  = (exit_price_long  - (ll['entry_price'] or 0)) / 100 * face * ll['qty']
+        pnl_short = ((ls['entry_price'] or 0) - exit_price_short) / 100 * face * ls['qty']
         pnl_total = pnl_long + pnl_short
         self.closed_trades.append({
             **pos,

@@ -1,5 +1,5 @@
 """
-bonds_arbitrage — Government Bond Arbitrage Strategy (Scorpio)
+bonds_arbitrage — Government Bond Spread Arbitrage Strategy (Scorpio v2.0)
 """
 
 from .config import *
